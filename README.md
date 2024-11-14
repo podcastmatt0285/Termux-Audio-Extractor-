@@ -30,6 +30,21 @@ Upon running the script, you will be prompted to input your desired base directo
 
 The script will then proceed to download, convert, and zip the audio files, notifying you of the progress and any errors encountered.
 
+## Running the Script
+
+### Steps:
+
+1. **Clone the Repository**:
+   `git clone https://github.com/podcastmatt0285/Termux-Audio-Extractor-.git`
+   
+   `cd Termux-Audio-Extractor-`
+
+2. **Make the Script Executable**:
+   `chmod +x Extractor.sh`
+
+3. **Run the Script**:
+   `./Extractor.sh`
+
 ## Contributing
 
 Feel free to fork this repository, open issues, and submit pull requests to improve the script. Contributions are welcome and appreciated!
