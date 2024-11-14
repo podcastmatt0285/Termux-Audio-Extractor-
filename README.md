@@ -34,7 +34,7 @@ Upon running the script, you will be prompted to input your desired base directo
 
 1. **Enter Base Directory**: Provide the base directory where you want the music to be stored. Default is `/data/data/com.termux/files/home/storage/music/termux`.
 2. **Enter Playlist Directory Name**: Specify the directory name for the playlist. Default is `Beat_That`.
-3. **Enter YouTube Playlist URL**: Provide the URL of the YouTube playlist you want to download. Default is 'https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=txvNOdun-krR6yvW'.
+3. **Enter YouTube Playlist URL**: Provide the URL of the YouTube playlist you want to download. Default is `https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=txvNOdun-krR6yvW`.
 
 The script will then proceed to download, convert, and zip the audio files, notifying you of the progress and any errors encountered.
 
