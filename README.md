@@ -17,9 +17,6 @@
 - Termux
 - termux-api
 - termux-notification
-- yt-dlp
-- zip
-- xargs
 
 ## Usage
 
