@@ -35,7 +35,7 @@ The script will then proceed to download, convert, and zip the audio files, noti
 ### Steps:
 
 1. **Install Git**:
-   `pkg install git`
+   ```pkg install git```
 
 2. **Clone the Repository**:
    ```sh
@@ -43,10 +43,10 @@ The script will then proceed to download, convert, and zip the audio files, noti
    cd Termux-Audio-Extractor-
 
 3. **Make the Script Executable**:
-   `chmod +x Extractor.sh`
+   ```chmod +x Extractor.sh```
 
 4. **Run the Script**:
-   `./Extractor.sh`
+   ```./Extractor.sh```
 
 ## Updating the Script
 
