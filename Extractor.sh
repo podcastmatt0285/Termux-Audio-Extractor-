@@ -67,8 +67,9 @@ echo "Enter the playlist directory name (default: Beat_That):"
 read -r PLAYLIST_DIR
 PLAYLIST_DIR=${PLAYLIST_DIR:-Beat_That}
 
-echo "Enter the YouTube playlist URL:"
+echo "Enter the YouTube playlist URL (default: https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=kmenK0-ShrP6mT74):"
 read -r YOUTUBE_PLAYLIST_URL
+YOUTUBE_PLAYLIST_URL=${YOUTUBE_PLAYLIST_URL:-https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=kmenK0-ShrP6mT74}
 
 ZIPFILE="$PLAYLIST_DIR.zip"
 LOGFILE="download.log"
