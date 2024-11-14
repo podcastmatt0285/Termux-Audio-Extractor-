@@ -12,8 +12,7 @@
 - **Cleanup**: Automatically clean up old logs and temporary files to keep your device organized.
 - **Zipping**: Compress downloaded files into a ZIP archive for easy sharing and storage.
 
-## Requirements
-  `*You must download each of the following:*`
+## Requirements - *You must download each of the following:*
 
 - F-Droid
 
