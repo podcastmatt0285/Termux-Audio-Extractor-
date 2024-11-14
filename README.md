@@ -15,8 +15,9 @@
 ## Requirements
 
 - Termux
+  https://f-droid.org/en/packages/com.termux
 - termux-api
-- termux-notification
+  https://f-droid.org/en/packages/com.termux.api
 
 ## Usage
 
