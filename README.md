@@ -59,6 +59,7 @@ To make sure you're running the latest version of the Termux Audio Extractor scr
 
 2. **Fetch the Latest Changes from the GitHub Repository**:
    ```sh
+   git checkout --Extractor.sh
    git pull
    ```
 
