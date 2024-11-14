@@ -48,6 +48,22 @@ The script will then proceed to download, convert, and zip the audio files, noti
 4. **Run the Script**:
    `./Extractor.sh`
 
+## Updating the Script
+
+To make sure you're running the latest version of the Termux Audio Extractor script, follow these steps:
+
+1. **Navigate to the Repository Directory**:
+   ```sh
+   cd ~/Termux-Audio-Extractor-
+   ```
+
+2. **Fetch the Latest Changes from the GitHub Repository**:
+   ```sh
+   git pull
+   ```
+
+By regularly updating the repository, you can ensure that you have the latest features and improvements.
+
 ## Contributing
 
 Feel free to fork this repository, open issues, and submit pull requests to improve the script. Contributions are welcome and appreciated!
