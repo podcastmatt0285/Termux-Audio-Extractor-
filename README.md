@@ -35,14 +35,14 @@ The script will then proceed to download, convert, and zip the audio files, noti
 ### Steps:
 
 1. **Clone the Repository**:
+   `pkg install git`
    `git clone https://github.com/podcastmatt0285/Termux-Audio-Extractor-.git`
-   
    `cd Termux-Audio-Extractor-`
 
-2. **Make the Script Executable**:
+3. **Make the Script Executable**:
    `chmod +x Extractor.sh`
 
-3. **Run the Script**:
+4. **Run the Script**:
    `./Extractor.sh`
 
 ## Contributing
