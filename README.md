@@ -14,10 +14,16 @@
 
 ## Requirements
 
+- F-Droid
+
+  https://f-droid.org/F-Droid.apk
+
 - Termux
-  https://f-droid.org/en/packages/com.termux
+
+   https://f-droid.org/en/packages/com.termux
 - termux-api
-  https://f-droid.org/en/packages/com.termux.api
+
+   https://f-droid.org/en/packages/com.termux.api
 
 ## Usage
 
