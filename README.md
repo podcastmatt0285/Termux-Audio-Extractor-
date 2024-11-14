@@ -36,7 +36,7 @@ The script will then proceed to download, convert, and zip the audio files, noti
 
 1. **Install Git**:
    ```sh
-   pkg install git```
+   pkg install git
 
 3. **Clone the Repository**:
    ```sh
@@ -45,11 +45,11 @@ The script will then proceed to download, convert, and zip the audio files, noti
 
 4. **Make the Script Executable**:
    ```sh
-   chmod +x Extractor.sh```
+   chmod +x Extractor.sh
 
 6. **Run the Script**:
    ```sh
-   ./Extractor.sh```
+   ./Extractor.sh
 
 ## Updating the Script
 
