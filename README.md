@@ -116,6 +116,94 @@ The **updaterX** script is designed to streamline the process of updating and sy
 
 This script simplifies maintenance and ensures that your environment is always up-to-date with the latest changes to the `Extractor.sh` script. 
 
+# Termux Video Downloader Script
+
+This script downloads videos from a specified YouTube playlist, logs the process, handles errors, and zips the downloaded files. Notifications are styled with emojis for an enhanced user experience.
+
+## Features
+
+- **Download Videos**: Downloads the entire video instead of just the audio.
+- **Logging**: Logs messages, including errors and failed downloads.
+- **Notifications**: Sends Termux notifications with emojis for better readability.
+- **Dependency Check**: Checks and installs necessary dependencies (`yt-dlp`, `zip`, `xargs`).
+- **Cleanup**: Cleans up old logs and temporary files.
+- **ZIP Compression**: Compresses downloaded MP4 files into a ZIP archive.
+- **Final Notification**: Sends a final notification with buttons for rerun, delete ZIP, and exit Termux.
+
+## Prerequisites
+
+Ensure the following packages are installed on your Termux environment:
+- `yt-dlp`
+- `zip`
+- `xargs`
+- `termux-notification`
+
+## Usage
+
+1. **Save the Script**
+
+   Save the script to a file, e.g., `vidX.sh`.
+
+2. **Make the Script Executable**
+
+   Open Termux, navigate to the directory containing the script, and run:
+   ```bash
+   chmod +x vidX.sh
+   ```
+
+3. **Run the Script**
+
+   Execute the script by running:
+   ```bash
+   ./vidX.sh
+   ```
+
+4. **Input Parameters**
+
+   - Base Directory (default: `/data/data/com.termux/files/home/storage/music/termux`)
+   - Playlist Directory Name (default: `Beat_That`)
+   - YouTube Playlist URL (default: `https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=kmenK0-ShrP6mT74`)
+
+## Script Details
+
+### Functions
+
+- **log()**: Logs messages with a timestamp and sends a notification.
+- **log_failed()**: Logs failed files with a timestamp and sends a notification.
+- **handle_error()**: Handles errors, logs them, and sends a notification.
+- **check_dependencies()**: Checks for and installs necessary dependencies.
+- **cleanup()**: Cleans up old logs and temporary files.
+- **download_videos()**: Downloads videos from the provided YouTube playlist URL.
+
+### Notifications
+
+- Notifications include emojis for better readability.
+- Final notification includes buttons for rerun, delete ZIP, and exit Termux.
+
+## Example
+
+Here’s an example of how to run the script and enter parameters:
+
+```shell
+Enter the base directory (default: /data/data/com.termux/files/home/storage/music/termux):
+/data/data/com.termux/files/home/storage/music/termux
+
+Enter the playlist directory name (default: Beat_That):
+MyPlaylist
+
+Enter the YouTube playlist URL (default: https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=kmenK0-ShrP6mT74):
+https://youtu.be/JXPyD1VoaAU?si=8ydRd8r6NyoRAuL-
+```
+
+## Troubleshooting
+
+- Ensure all required packages are installed.
+- Check the logs (`download.log` and `failed.log`) for any errors.
+
+## License
+
+This project is licensed under the MIT License.
+
 ## Contributing
 
 Feel free to fork this repository, open issues, and submit pull requests to improve the script. Contributions are welcome and appreciated!
