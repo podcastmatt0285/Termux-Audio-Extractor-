@@ -140,25 +140,21 @@ Ensure the following packages are installed on your Termux environment:
 
 ## Usage
 
-1. **Save the Script**
-
-   Save the script to a file, e.g., `vidX.sh`.
-
-2. **Make the Script Executable**
+1. **Make the Script Executable**
 
    Open Termux, navigate to the directory containing the script, and run:
    ```bash
    chmod +x vidX.sh
    ```
 
-3. **Run the Script**
+2. **Run the Script**
 
    Execute the script by running:
    ```bash
    ./vidX.sh
    ```
 
-4. **Input Parameters**
+3. **Input Parameters**
 
    - Base Directory (default: `/data/data/com.termux/files/home/storage/music/termux`)
    - Playlist Directory Name (default: `Beat_That`)
