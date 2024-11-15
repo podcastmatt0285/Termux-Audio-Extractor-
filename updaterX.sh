@@ -5,6 +5,8 @@ cd ~/Termux-Audio-Extractor-
 
 # Discard any local changes to Extractor.sh
 git checkout -- Extractor.sh
+git checkout -- updateX.sh
+git checkout -- vidX.sh
 
 # Pull the latest changes from the repository
 git pull
