@@ -93,7 +93,7 @@ The **updaterX** script is designed to streamline the process of updating and sy
 - Termux Widget
 
   https://f-droid.org/en/packages/com.termux.widget
-  ###### The Termux:Widget is an add-on for the Termux app that allows users to create shortcuts to scripts and run them from a widget on their home screen. Install the Termux:Widget add-on from F-Droid's site. Place scripts in the $HOME/.shortcuts/ folder. Hold down the widget and choose the Termux:Widget widget to place it on the home screen. Tap the script to open a Termux instance and run it. *Benefits* The Termux:Widget allows users to quickly access frequently used commands without typing. 
+  ##### The Termux:Widget is an add-on for the Termux app that allows users to create shortcuts to scripts and run them from a widget on their home screen. Install the Termux:Widget add-on from F-Droid's site. Place scripts in the $HOME/.shortcuts/ folder. Hold down the widget and choose the Termux:Widget widget to place it on the home screen. Tap the script to open a Termux instance and run it. *Benefits* The Termux:Widget allows users to quickly access frequently used commands without typing. 
 
 ## Usage Instructions:
 
