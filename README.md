@@ -204,10 +204,6 @@ This project is licensed under the MIT License.
 
 Feel free to fork this repository, open issues, and submit pull requests to improve the script. Contributions are welcome and appreciated!
 
-## License
-
-This project is licensed under the MIT License.
-
 ## Contact
 
 For any questions or support, please reach out to podcastmatt0285@gmail.com
