@@ -9,8 +9,10 @@ git checkout -- Extractor.sh
 # Pull the latest changes from the repository
 git pull
 
-# Copy the updated Extractor.sh to the shortcuts directory
+# Copy the updated scripts to the shortcuts directory
 cp Extractor.sh ~/.shortcuts/
+cp updaterX ~/.shortcuts/
+cp vidX.sh ~/.shortcuts/
 
 # Ensure the script in the shortcuts directory is executable
 chmod +x ~/.shortcuts/Extractor.sh
