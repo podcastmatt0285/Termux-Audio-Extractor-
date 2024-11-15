@@ -22,6 +22,7 @@
 - Termux
 
    https://f-droid.org/en/packages/com.termux
+  
 - termux-api
 
    https://f-droid.org/en/packages/com.termux.api
@@ -75,6 +76,37 @@ To make sure you're running the latest version of the Termux Audio Extractor scr
    ```
 
 By regularly updating the repository, you can ensure that you have the latest features and improvements.
+
+# UpdaterX
+
+The **updaterX** script is designed to streamline the process of updating and synchronizing the `Extractor.sh` script between your repository and the Termux shortcuts directory. This ensures that you always have the most recent version of the `Extractor.sh` script accessible from both locations and can run the script via a home screen widget.
+
+## Key Features:
+1. **Automated Update**: The script navigates to the `Termux-Audio-Extractor-` directory, discards any local changes to `Extractor.sh`, and pulls the latest version from the remote GitHub repository.
+2. **Seamless Copy**: Once updated, the script copies the `Extractor.sh` script to the `.shortcuts` directory, ensuring that any modifications are immediately available in both places.
+3. **Ensures Executability**: The script checks and ensures that the copied `Extractor.sh` script in the `.shortcuts` directory is executable.
+4. **User Notification**: It provides a console message confirming the successful update and copy operations.
+
+## Requirements
+###### You must download the following:
+
+- Termux Widget
+
+  https://f-droid.org/en/packages/com.termux.widget
+
+## Usage Instructions:
+
+1. **Make the Script Executable**:
+   ```sh
+   chmod +x update_extractor.sh
+   ```
+
+2. **Run the Script**:
+   ```sh
+   ./update_extractor.sh
+   ```
+
+This script simplifies maintenance and ensures that your environment is always up-to-date with the latest changes to the `Extractor.sh` script. 
 
 ## Contributing
 
