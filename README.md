@@ -98,12 +98,12 @@ The **updaterX** script is designed to streamline the process of updating and sy
 
 1. **Make the Script Executable**:
    ```sh
-   chmod +x update_extractor.sh
+   chmod +x updaterX.sh
    ```
 
 2. **Run the Script**:
    ```sh
-   ./update_extractor.sh
+   ./updaterX.sh
    ```
 
 This script simplifies maintenance and ensures that your environment is always up-to-date with the latest changes to the `Extractor.sh` script. 
