@@ -16,5 +16,7 @@ cp vidX.sh ~/.shortcuts/
 
 # Ensure the script in the shortcuts directory is executable
 chmod +x ~/.shortcuts/Extractor.sh
+chmod +x ~/.shortcuts/updaterX
+chmod +x ~/.shortcuts/vidX.sh
 
-echo "Extractor.sh has been updated and copied to ~/.shortcuts/"
+echo "Extractor, updaterX, vidX have been updated and copied to ~/.shortcuts/"
