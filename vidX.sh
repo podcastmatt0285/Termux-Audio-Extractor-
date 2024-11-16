@@ -61,9 +61,9 @@ download_videos() {
 termux-notification --title "🚀 Script Started" --content "The download script has started." --priority "high"
 
 # Variables
-echo "Enter the base directory (default: /data/data/com.termux/files/home/storage/music/termux):"
+echo "Enter the base directory (default: /data/data/com.termux/files/home/storage/movies/termux):"
 read -r BASE_DIR
-BASE_DIR=${BASE_DIR:-/data/data/com.termux/files/home/storage/music/termux}
+BASE_DIR=${BASE_DIR:-/data/data/com.termux/files/home/storage/movies/termux}
 
 echo "Enter the playlist directory name (default: Beat_That):"
 read -r PLAYLIST_DIR
