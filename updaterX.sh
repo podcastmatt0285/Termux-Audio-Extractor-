@@ -7,7 +7,6 @@ cd ~/Termux-Audio-Extractor-
 git checkout -- Extractor.sh
 git checkout -- updaterX.sh
 git checkout -- vidX.sh
-git checkout -- printReadme.sh
 
 # Pull the latest changes from the repository
 git pull
@@ -21,10 +20,3 @@ cp vidX.sh ~/.shortcuts/
 chmod +x ~/.shortcuts/Extractor.sh
 chmod +x ~/.shortcuts/updaterX.sh
 chmod +x ~/.shortcuts/vidX.sh
-
-# Print Readme.md
-cd
-cd ~/Termux-Audio-Extractor-
-cp printReadme.sh ~/.shortcuts/
-chmod +x printReadme.sh
-./printReadme.sh
