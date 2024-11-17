@@ -72,3 +72,62 @@ Zip Option: Enter y to compress files into a .zip.
 
 Access the audio files in the specified directory.
 
+
+
+
+Installation and Setup Guide for vidX.sh
+
+1. Install Required Apps
+
+Download Termux, Termux:API, and Termux:Widget from F-Droid or your app store.
+
+
+2. Grant Termux Permissions
+
+Run the following command in Termux to enable storage access:
+
+termux-setup-storage
+
+3. Clone the Repository
+
+Install Git and download the project files:
+
+pkg install git
+git clone https://github.com/podcastmatt0285/Termux-Audio-Extractor-
+cd Termux-Audio-Extractor-
+
+4. Run the Updater Script
+
+Make the updater script executable and run it:
+
+chmod +x updaterX.sh
+bash updaterX.sh
+
+This installs necessary dependencies and configures the environment.
+
+5. Test the Widget
+
+Add the Termux Widget to your home screen.
+
+Test the widget by running updaterX.sh from it to confirm setup.
+
+6. Run vidX.sh
+
+From the Termux Widget, execute vidX.sh and follow the prompts:
+
+1. Enter the Base Directory where videos will be stored. Default: /storage/videos/termux.
+
+
+2. Specify the Playlist Directory Name to organize downloads.
+
+
+3. Provide the YouTube Playlist URL for the videos you wish to download.
+
+
+4. Choose whether to compress the downloaded files into a ZIP archive (enter y for yes or n for no).
+
+
+
+7. Access Your Videos
+
+Downloaded (and optionally zipped) video files will be organized in the specified directory.
