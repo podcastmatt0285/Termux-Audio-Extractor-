@@ -15,6 +15,11 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Configure Git user
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+
       - name: Pull updates from yt-dlp
         run: |
           git remote add yt-dlp https://github.com/yt-dlp/yt-dlp.git
