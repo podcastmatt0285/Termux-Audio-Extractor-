@@ -25,5 +25,6 @@ chmod +x ~/.shortcuts/printReadme.sh
 
 # Print Readme.md
 cd ~/Termux-Audio-Extractor-
+git checkout -- printReadme.sh
 chmod +x printReadme.sh
 ./printReadme.sh
