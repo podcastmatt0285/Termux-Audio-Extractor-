@@ -1,209 +1,278 @@
-# Termux Audio Extractor
+Termux Audio Extractor
 
-**Termux Audio Extractor** is a versatile and user-friendly script designed for music enthusiasts who want to download and manage YouTube playlists directly on their Termux-enabled Android devices. This script utilizes the power of `yt-dlp` to extract audio from YouTube playlists and organizes the files efficiently, making it an ideal tool for building a local music library.
+Termux Audio Extractor is a versatile and user-friendly script designed for music enthusiasts who want to download and manage YouTube playlists directly on their Termux-enabled Android devices. This script utilizes the power of yt-dlp to extract audio, convert it to MP3, and organize the files efficiently. It's an ideal tool for building a local music library while embracing the simplicity of the Termux environment.
 
-## Features
 
-- **Download Entire Playlists**: Fetch and download entire YouTube playlists with ease.
-- **MP3 Conversion**: Automatically convert videos to MP3 format for convenient playback.
-- **Customizable**: Prompt users to input their desired directories and playlist URLs for a personalized experience.
-- **Notifications**: Utilize Termux notifications to keep track of download progress and completion status.
-- **Error Handling**: Robust error handling to ensure smooth execution and log any failed downloads.
-- **Cleanup**: Automatically clean up old logs and temporary files to keep your device organized.
-- **Zipping**: Compress downloaded files into a ZIP archive for easy sharing and storage.
+---
 
-## Requirements
-###### You must download each of the following:
+Table of Contents
 
-- F-Droid
+1. Introduction
 
-  https://f-droid.org/F-Droid.apk
 
-- Termux
+2. Features
 
-   https://f-droid.org/en/packages/com.termux
-  
-- termux-api
 
-   https://f-droid.org/en/packages/com.termux.api
+3. Requirements
 
-## Usage
 
-Upon running the script, you will be prompted to input your desired base directory, playlist directory name, and YouTube playlist URL. The script will handle the download, conversion, and organization of the audio files.
+4. Usage
 
-### Steps:
+Beginner-Friendly Defaults
 
-1. **Enter Base Directory**: Provide the base directory where you want the music to be stored. Default is `/data/data/com.termux/files/home/storage/music/termux`.
-2. **Enter Playlist Directory Name**: Specify the directory name for the playlist. Default is `Beat_That`.
-3. **Enter YouTube Playlist URL**: Provide the URL of the YouTube playlist you want to download. Default is `https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=txvNOdun-krR6yvW`.
+Running the Script
 
-The script will then proceed to download, convert, and zip the audio files, notifying you of the progress and any errors encountered.
 
-## Running the Script
 
-### Steps:
+5. Advanced Features
 
-1. **Install Git**:
-   ```sh
-   pkg install git
+UpdaterX Widget Setup
 
-3. **Clone the Repository**:
-   ```sh
-   git clone https://github.com/podcastmatt0285/Termux-Audio-Extractor-.git
-   cd Termux-Audio-Extractor-
+Video Downloader Script
 
-4. **Make the Script Executable**:
-   ```sh
-   chmod +x Extractor.sh
 
-6. **Run the Script**:
-   ```sh
-   ./Extractor.sh
 
-## Updating the Script
+6. Sample Logs
 
-To make sure you're running the latest version of the Termux Audio Extractor script, follow these steps:
 
-1. **Navigate to the Repository Directory**:
-   ```sh
-   cd ~/Termux-Audio-Extractor-
-   ```
+7. Notifications
 
-2. **Fetch the Latest Changes from the GitHub Repository**:
-   ```sh
-   git checkout --Extractor.sh
-   git pull
-   ```
 
-By regularly updating the repository, you can ensure that you have the latest features and improvements.
+8. Troubleshooting
 
-# UpdaterX
 
-The **updaterX** script is designed to streamline the process of updating and synchronizing the `Extractor.sh` script between your repository and the Termux shortcuts directory. This ensures that you always have the most recent version of the `Extractor.sh` script accessible from both locations and can run the script via a home screen widget.
+9. Acknowledgments
 
-## Key Features:
-1. **Automated Update**: The script navigates to the `Termux-Audio-Extractor-` directory, discards any local changes to `Extractor.sh`, and pulls the latest version from the remote GitHub repository.
-2. **Seamless Copy**: Once updated, the script copies the `Extractor.sh` script to the `.shortcuts` directory, ensuring that any modifications are immediately available in both places.
-3. **Ensures Executability**: The script checks and ensures that the copied `Extractor.sh` script in the `.shortcuts` directory is executable.
-4. **User Notification**: It provides a console message confirming the successful update and copy operations.
 
-## Requirements
-###### You must download the following:
+10. License
 
-- Termux Widget
 
-  https://f-droid.org/en/packages/com.termux.widget
-  
-- ##### The Termux:Widget is an add-on for the Termux app that allows users to create shortcuts to scripts and run them from a widget on their home screen.
-- ##### Install the Termux:Widget add-on from F-Droid's site.
-- ##### Place scripts in the $HOME/.shortcuts/ folder.
-- ##### Hold down the widget and choose the Termux:Widget widget to place it on the home screen.
-- ##### Tap the script to open a Termux instance and run it.
+11. Contact
 
-  *Benefits* The Termux:Widget allows users to quickly access frequently used commands without typing. 
 
-## Usage Instructions:
 
-1. **Make the Script Executable**:
-   ```sh
-   chmod +x updaterX.sh
-   ```
 
-2. **Run the Script**:
-   ```sh
-   ./updaterX.sh
-   ```
+---
 
-This script simplifies maintenance and ensures that your environment is always up-to-date with the latest changes to the `Extractor.sh` script. 
+Introduction
 
-# Termux Video Downloader Script
+Termux Audio Extractor makes downloading YouTube playlists and converting them into high-quality MP3 files seamless. It is designed for Android devices running Termux and is perfect for music enthusiasts looking to curate their personal music libraries.
 
-This script downloads videos from a specified YouTube playlist, logs the process, handles errors, and zips the downloaded files. Notifications are styled with emojis for an enhanced user experience.
 
-## Features
+---
 
-- **Download Videos**: Downloads the entire video instead of just the audio.
-- **Logging**: Logs messages, including errors and failed downloads.
-- **Notifications**: Sends Termux notifications with emojis for better readability.
-- **Dependency Check**: Checks and installs necessary dependencies (`yt-dlp`, `zip`, `xargs`).
-- **Cleanup**: Cleans up old logs and temporary files.
-- **ZIP Compression**: Compresses downloaded MP4 files into a ZIP archive.
-- **Final Notification**: Sends a final notification with buttons for rerun, delete ZIP, and exit Termux.
+Features
 
-## Prerequisites
+Download Entire Playlists: Fetch and download entire YouTube playlists with ease.
 
-Ensure the following packages are installed on your Termux environment:
-- `yt-dlp`
-- `zip`
-- `xargs`
-- `termux-notification`
+MP3 Conversion: Automatically convert videos to MP3 format for convenient playback.
 
-## Usage
+Customizable Settings: Input desired directories and playlist URLs for a personalized experience.
 
-1. **Make the Script Executable**
+Progress Notifications: Termux notifications keep you informed about download progress and completion.
 
-   Open Termux, navigate to the directory containing the script, and run:
-   ```bash
-   chmod +x vidX.sh
-   ```
+Error Handling: Logs failed downloads and provides notifications for troubleshooting.
 
-2. **Run the Script**
+Automatic Cleanup: Removes old logs and temporary files to keep your device organized.
 
-   Execute the script by running:
-   ```bash
-   ./vidX.sh
-   ```
+ZIP Compression: Compress downloaded files into a ZIP archive for easy sharing and storage.
 
-3. **Input Parameters**
 
-   - Base Directory (default: `/data/data/com.termux/files/home/storage/music/termux`)
-   - Playlist Directory Name (default: `Beat_That`)
-   - YouTube Playlist URL (default: `https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=kmenK0-ShrP6mT74`)
 
-## Script Details
+---
 
-### Functions
+Requirements
 
-- **log()**: Logs messages with a timestamp and sends a notification.
-- **log_failed()**: Logs failed files with a timestamp and sends a notification.
-- **handle_error()**: Handles errors, logs them, and sends a notification.
-- **check_dependencies()**: Checks for and installs necessary dependencies.
-- **cleanup()**: Cleans up old logs and temporary files.
-- **download_videos()**: Downloads videos from the provided YouTube playlist URL.
+Ensure the following tools are downloaded and installed:
 
-### Notifications
+F-Droid: Download F-Droid
 
-- Notifications include emojis for better readability.
-- Final notification includes buttons for rerun, delete ZIP, and exit Termux.
+Termux: Download Termux
 
-## Example
+Termux API: Download Termux API
 
-Here’s an example of how to run the script and enter parameters:
 
-```shell
-Enter the base directory (default: /data/data/com.termux/files/home/storage/music/termux):
-/data/data/com.termux/files/home/storage/music/termux
+Optional:
 
-Enter the playlist directory name (default: Beat_That):
-MyPlaylist
+Termux Widget: Download Termux Widget for easy access to the script.
 
-Enter the YouTube playlist URL (default: https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=kmenK0-ShrP6mT74):
-https://youtu.be/JXPyD1VoaAU?si=8ydRd8r6NyoRAuL-
-```
 
-## Troubleshooting
 
-- Ensure all required packages are installed.
-- Check the logs (`download.log` and `failed.log`) for any errors.
+---
 
-## License
+Usage
+
+This script simplifies the process of downloading, converting, and organizing music from YouTube playlists.
+
+Beginner-Friendly Defaults
+
+If you are new to Termux, press Enter when asked to input parameters. The script will use the following defaults:
+
+Base Directory: /data/data/com.termux/files/home/storage/music/termux
+
+Playlist Directory Name: Beat_That
+
+YouTube Playlist URL: https://www.example.com/playlist?list=XYZ
+
+
+Running the Script
+
+1. Install Git:
+
+pkg install git
+
+
+2. Clone the Repository:
+
+git clone https://github.com/podcastmatt0285/Termux-Audio-Extractor-.git  
+cd Termux-Audio-Extractor-
+
+
+3. Make the Script Executable:
+
+chmod +x Extractor.sh
+
+
+4. Run the Script:
+
+./Extractor.sh
+
+
+
+Follow the prompts to specify directories and playlists or use the default settings.
+
+
+---
+
+Advanced Features
+
+UpdaterX Widget Setup
+
+The UpdaterX script ensures your Extractor.sh script stays updated and accessible via a home screen widget.
+
+Steps:
+
+1. Create a Shortcuts Folder:
+
+mkdir -p ~/.shortcuts
+
+
+2. Copy the Script to Shortcuts:
+
+cp updaterX.sh ~/.shortcuts/
+
+
+3. Add Termux Widget to Home Screen:
+
+Long-press on your home screen.
+
+Select "Widgets" and drag the Termux:Widget to your desired location.
+
+
+
+4. Run the Script via Widget:
+Tap the widget to update or execute the script directly from your home screen.
+
+
+
+
+---
+
+Video Downloader Script
+
+This script downloads full videos from YouTube playlists.
+
+Features:
+
+Full Video Downloads: Downloads complete MP4 files.
+
+Logging and Notifications: Provides logs and progress notifications.
+
+ZIP Compression: Compresses video files into a ZIP archive.
+
+
+Usage:
+
+1. Make the Script Executable:
+
+chmod +x vidX.sh
+
+
+2. Run the Script:
+
+./vidX.sh
+
+
+
+
+---
+
+Sample Logs
+
+Here’s a sample download.log:
+
+[2024-11-16 10:34:12] INFO: Download started for playlist: MyPlaylist
+[2024-11-16 10:35:45] INFO: Download complete: Track01.mp3
+[2024-11-16 10:36:02] ERROR: Failed to download Track02.mp3. Reason: Network timeout
+[2024-11-16 10:36:10] INFO: ZIP archive created: MyPlaylist.zip
+
+
+---
+
+Notifications
+
+Example Notifications
+
+Standard Notification:
+
+✅ Termux Audio Extractor  
+Download Complete: MyPlaylist.zip
+
+Error Notification:
+
+⚠️ Termux Audio Extractor  
+Error: Failed to download Track02.mp3
+
+
+---
+
+Troubleshooting
+
+Ensure all required packages are installed:
+
+yt-dlp, zip, xargs, termux-notification.
+
+
+Check the logs (download.log and failed.log) for error details.
+
+Use default directories if custom paths fail.
+
+
+
+---
+
+Acknowledgments
+
+This project is powered by the following:
+
+yt-dlp
+
+Termux and its robust ecosystem.
+
+
+Special thanks to contributors and testers who helped improve the script.
+
+
+---
+
+License
 
 This project is licensed under the MIT License.
 
-## Contributing
 
-Feel free to fork this repository, open issues, and submit pull requests to improve the script. Contributions are welcome and appreciated!
+---
 
-## Contact
+Contact
 
-For any questions or support, please reach out to podcastmatt0285@gmail.com
+For questions or support, email: podcastmatt0285@gmail.com
+
