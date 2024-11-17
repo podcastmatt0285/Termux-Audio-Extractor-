@@ -19,7 +19,10 @@ cp Extractor.sh ~/.shortcuts/
 cp updaterX.sh ~/.shortcuts/
 cp vidX.sh ~/.shortcuts/
 
-# Ensure the script in the shortcuts directory is executable
+# Ensure the scripts are executable
 chmod +x ~/.shortcuts/Extractor.sh
 chmod +x ~/.shortcuts/updaterX.sh
 chmod +x ~/.shortcuts/vidX.sh
+chmod +x Extractor.sh
+chmod +x updaterX.sh
+chmod +x vidX.sh
