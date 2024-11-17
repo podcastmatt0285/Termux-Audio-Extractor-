@@ -71,6 +71,9 @@ echo "Enter the YouTube playlist URL (default: https://music.youtube.com/playlis
 read -r YOUTUBE_PLAYLIST_URL
 YOUTUBE_PLAYLIST_URL=${YOUTUBE_PLAYLIST_URL:-https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=kmenK0-ShrP6mT74}
 
+# Ask user if they want to zip the files immediately after URL input
+read -r -p "Do you want to zip the downloaded MP3 files (y/N)? " zip_answer
+
 ZIPFILE="$PLAYLIST_DIR.zip"
 LOGFILE="download.log"
 FAILED_LOG="failed.log"
@@ -80,26 +83,14 @@ FULL_PLAYLIST_DIR="$BASE_DIR/$PLAYLIST_DIR"
 
 check_dependencies
 download_audio
-if [ -f "$ZIPFILE" ]; then
-    log "ZIP file $ZIPFILE already exists. Removing it."
-    rm "$ZIPFILE"
-fi
-if ls "$FULL_PLAYLIST_DIR"/*.mp3 1> /dev/null 2>&1; then
-    zip -r "$ZIPFILE" "$FULL_PLAYLIST_DIR"/*.mp3 || handle_error "Failed to create ZIP file"
-    rm "$FULL_PLAYLIST_DIR"/*.mp3
-    log "Zipped all MP3 files in $FULL_PLAYLIST_DIR into $ZIPFILE"
-    termux-notification --title "Zipping Complete" --content "Zipped all MP3 files in $FULL_PLAYLIST_DIR into $ZIPFILE"
-else
-    handle_error "No MP3 files found to zip"
-fi
-mv "$ZIPFILE" "$FULL_PLAYLIST_DIR/$ZIPFILE" || handle_error "Failed to move ZIP file to $FULL_PLAYLIST_DIR"
-if [ -s "$ERROR_SUMMARY" ]; then
-    termux-notification --title "Errors Encountered" --content "Check $ERROR_SUMMARY for details."
-fi
-cleanup
 
-# Final notification with buttons
-termux-notification --title "Script Completed" --content "The script has completed successfully." \
-    --button1 "Run Again" --button1-action "bash /data/data/com.termux/files/home/scripts/notification_buttons/playlist_rerun" \
-    --button2 "Delete ZIP" --button2-action "bash /data/data/com.termux/files/home/scripts/notification_buttons/delete_zip" \
-    --button3 "Exit Termux" --button3-action "bash /data/data/com.termux/files/home/scripts/notification_buttons/exit"
+if [[ "$zip_answer" =~ ^([Yy])$ ]]; then
+    if [ -f "$ZIPFILE" ]; then
+        log "ZIP file $ZIPFILE already exists. Removing it."
+        rm "$ZIPFILE"
+    fi
+    if ls "$FULL_PLAYLIST_DIR"/*.mp3 1> /dev/null 2>&1; then
+        zip -r "$ZIPFILE" "$FULL_PLAYLIST_DIR"/*.mp3 || handle_error "Failed to create ZIP file"
+        rm "$FULL_PLAYLIST_DIR"/*.mp3
+        log "Zipped all MP3 files in $FULL_PLAYLIST_DIR into $ZIPFILE"
+        termux-notification --title "Zipping Complete" --content "Zipped all MP
