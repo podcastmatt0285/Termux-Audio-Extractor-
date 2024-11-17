@@ -211,9 +211,9 @@ Sample Logs
 
 Here’s a sample download.log:
 
-[2024-11-16 10:34:12] INFO: Download started for playlist: MyPlaylist
-[2024-11-16 10:35:45] INFO: Download complete: Track01.mp3
-[2024-11-16 10:36:02] ERROR: Failed to download Track02.mp3. Reason: Network timeout
+[2024-11-16 10:34:12] INFO: Download started for playlist: MyPlaylist  
+[2024-11-16 10:35:45] INFO: Download complete: Track01.mp3  
+[2024-11-16 10:36:02] ERROR: Failed to download Track02.mp3. Reason: Network timeout  
 [2024-11-16 10:36:10] INFO: ZIP archive created: MyPlaylist.zip
 
 
@@ -275,4 +275,3 @@ This project is licensed under the MIT License.
 Contact
 
 For questions or support, email: podcastmatt0285@gmail.com
-
