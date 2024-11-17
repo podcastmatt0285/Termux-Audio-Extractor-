@@ -24,4 +24,5 @@ chmod +x ~/.shortcuts/vidX.sh
 chmod +x ~/.shortcuts/printReadme.sh
 
 # Print Readme.md
+chmod +x ~/printReadme.sh
 ./printReadme.sh
