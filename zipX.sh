@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Navigate to the Extractor directory
-cd ~/Termux-Audio-Extractor-
-
 # Function to log messages
 log() {
     if $VERBOSE; then
