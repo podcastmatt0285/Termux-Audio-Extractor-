@@ -1,0 +1,23 @@
+name: Update supportedsites.md
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight
+  workflow_dispatch:
+
+jobs:
+  update-supportedsites:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Pull updates from yt-dlp
+        run: |
+          git remote add yt-dlp https://github.com/yt-dlp/yt-dlp.git
+          git fetch yt-dlp
+          git checkout yt-dlp/master -- supportedsites.md
+          git add supportedsites.md
+          git commit -m "Automated update of supportedsites.md from yt-dlp"
+          git push origin main
