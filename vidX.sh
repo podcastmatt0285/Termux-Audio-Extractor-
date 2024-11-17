@@ -7,7 +7,7 @@ log() {
     else
         echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> $LOGFILE
     fi
-    termux-notification --title " Log Entry" --content "$1" --button1 " View Log" --button1-action "less $LOGFILE" \
+    termux-notification --title "Log Entry" --content "$1" --button1 "View Log" --button1-action "less $LOGFILE" \
         --button2 "❌ Dismiss" --button2-action "termux-notification-remove %i" --priority "max"
 }
 
@@ -21,30 +21,41 @@ log_failed() {
 handle_error() {
     log_failed "$1"
     log "Error encountered: $1"
-    termux-notification --title " Error" --content "An error occurred: $1" --priority "max"
+    termux-notification --title "Error" --content "An error occurred: $1" --priority "max"
     exit 1
 }
 
 # Function to check if dependencies are installed
 check_dependencies() {
-    log " Updating and upgrading packages"
+    log "Updating and upgrading packages"
     pkg update && pkg upgrade -y
-    log " Checking for required packages"
-    for pkg in yt-dlp zip xargs; do
+    log "Checking for required packages"
+    for pkg in python python-pip zip xargs ffmpeg termux-api; do
         if ! command -v $pkg &> /dev/null; then
             log "$pkg is not installed. Installing..."
-            termux-notification --title " Installing Package" --content "Installing $pkg" \
+            termux-notification --title "Installing Package" --content "Installing $pkg" \
                 --priority "high"
             pkg install $pkg -y || handle_error "Failed to install $pkg"
         else
             log "$pkg is already installed."
         fi
     done
+    
+    # Install yt-dlp via pip
+    log "Upgrading pip and installing yt-dlp"
+    python -m pip install --upgrade pip
+    python -m pip install -U yt-dlp || {
+        # If pip installation fails, download yt-dlp directly
+        log "Failed to install yt-dlp via pip. Downloading directly from GitHub."
+        curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o yt-dlp
+        chmod +x yt-dlp
+        mv yt-dlp $PREFIX/bin/
+    }
 }
 
 # Function to clean up old logs and temporary files
 cleanup() {
-    log " Cleaning up old logs and temporary files"
+    log "Cleaning up old logs and temporary files"
     find . -name "*.log" -type f -mtime +30 -exec rm {} \;
     find . -name "*.mp4" -type f -exec rm {} \;
 }
@@ -58,7 +69,7 @@ download_videos() {
 }
 
 # Main script execution
-termux-notification --title " Script Started" --content "The download script has started." --priority "high"
+termux-notification --title "Script Started" --content "The download script has started." --priority "high"
 
 # Variables
 echo "Enter the base directory (default: /data/data/com.termux/files/home/storage/movies/termux):"
@@ -84,4 +95,20 @@ check_dependencies
 download_videos
 
 # Ask user if they want to zip the files after download
-read -r -p "Do you want to zip the downloaded
+read -r -p "Do you want to zip the downloaded MP4 files (y/N)? " zip_answer
+
+if [[ "$zip_answer" =~ ^([Yy])$ ]]; then
+    if [ -f "$ZIPFILE" ]; then
+        log "ZIP file $ZIPFILE already exists. Removing it."
+        rm "$ZIPFILE"
+    fi
+    if ls "$FULL_PLAYLIST_DIR"/*.mp4 1> /dev/null 2>&1; then
+        zip -r "$ZIPFILE" "$FULL_PLAYLIST_DIR"/*.mp4 || handle_error "Failed to create ZIP file"
+        rm "$FULL_PLAYLIST_DIR"/*.mp4
+        log "Zipped all MP4 files in $FULL_PLAYLIST_DIR into $ZIPFILE"
+        termux-notification --title "Zipping Complete" --content "Zipped all MP4 files."
+    fi
+fi
+
+# Cleanup old logs and temporary files
+cleanup
