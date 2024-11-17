@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Ensure ~/.shortcuts/ dir exists 
+mkdir ~/.shortcuts/
+
 # Navigate to the Extractor directory
 cd ~/Termux-Audio-Extractor-
 
