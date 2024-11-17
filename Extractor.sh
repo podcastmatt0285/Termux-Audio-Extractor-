@@ -29,7 +29,7 @@ check_dependencies() {
     log "Updating and upgrading packages"
     pkg update && pkg upgrade -y
     log "Checking for required packages"
-    for pkg in yt-dlp zip xargs; do
+    for pkg in python python-pip zip xargs ffmpeg termux-api; do
         if ! command -v $pkg &> /dev/null; then
             log "$pkg is not installed. Installing..."
             termux-notification --title "Installing Package" --content "Installing $pkg"
@@ -38,6 +38,17 @@ check_dependencies() {
             log "$pkg is already installed."
         fi
     done
+    
+    # Install yt-dlp via pip
+    log "Upgrading pip and installing yt-dlp"
+    python -m pip install --upgrade pip
+    python -m pip install -U yt-dlp || {
+        # If pip installation fails, download yt-dlp directly
+        log "Failed to install yt-dlp via pip. Downloading directly from GitHub."
+        curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o yt-dlp
+        chmod +x yt-dlp
+        mv yt-dlp $PREFIX/bin/
+    }
 }
 
 # Function to clean up old logs and temporary files
@@ -93,4 +104,9 @@ if [[ "$zip_answer" =~ ^([Yy])$ ]]; then
         zip -r "$ZIPFILE" "$FULL_PLAYLIST_DIR"/*.mp3 || handle_error "Failed to create ZIP file"
         rm "$FULL_PLAYLIST_DIR"/*.mp3
         log "Zipped all MP3 files in $FULL_PLAYLIST_DIR into $ZIPFILE"
-        termux-notification --title "Zipping Complete" --content "Zipped all MP
+        termux-notification --title "Zipping Complete" --content "Zipped all MP3 files."
+    fi
+fi
+
+# Cleanup old logs and temporary files
+cleanup
