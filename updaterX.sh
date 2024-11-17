@@ -16,16 +16,15 @@ git pull
 cp Extractor.sh ~/.shortcuts/
 cp updaterX.sh ~/.shortcuts/
 cp vidX.sh ~/.shortcuts/
-cp printReadme.sh ~/.shortcuts/
 
 # Ensure the script in the shortcuts directory is executable
 chmod +x ~/.shortcuts/Extractor.sh
 chmod +x ~/.shortcuts/updaterX.sh
 chmod +x ~/.shortcuts/vidX.sh
-chmod +x ~/.shortcuts/printReadme.sh
 
 # Print Readme.md
 cd
 cd ~/Termux-Audio-Extractor-
+cp printReadme.sh ~/.shortcuts/
 chmod +x printReadme.sh
 ./printReadme.sh
