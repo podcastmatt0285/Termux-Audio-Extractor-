@@ -1,5 +1,31 @@
 #!/bin/bash
 
+# Function to check if Git is installed
+function check_git() {
+    if command -v git &> /dev/null; then
+        echo "Git is installed."
+    else
+        echo "Git is not installed. Installing Git..."
+        pkg update -y
+        pkg install git -y
+    fi
+}
+
+# Function to update Git
+function update_git() {
+    echo "Updating Git..."
+    pkg update -y
+    pkg upgrade git -y
+}
+
+# Main script
+check_git
+update_git
+
+# Verify Git installation
+echo "Git version:"
+git --version
+
 # Ensure ~/.shortcuts/ dir exists 
 mkdir ~/.shortcuts/
 
