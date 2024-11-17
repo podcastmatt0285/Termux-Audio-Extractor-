@@ -131,3 +131,30 @@ From the Termux Widget, execute vidX.sh and follow the prompts:
 7. Access Your Videos
 
 Downloaded (and optionally zipped) video files will be organized in the specified directory.
+
+
+
+Installation and Usage Guide for updaterX.sh
+
+1. Run the Script
+
+To update and sync the latest changes for the Termux scripts, run:
+
+bash updaterX.sh
+
+2. What the Script Does
+
+Ensures the ~/.shortcuts/ directory exists for Termux Widget scripts.
+
+Resets local changes to Extractor.sh, updaterX.sh, and vidX.sh.
+
+Pulls the latest changes from the repository.
+
+Copies updated scripts into the ~/.shortcuts/ directory.
+
+Sets the scripts as executable for Termux Widget.
+
+
+3. Verify the Update
+
+Ensure the latest versions of the scripts are present in the ~/.shortcuts/ directory and accessible from the Termux Widget.
