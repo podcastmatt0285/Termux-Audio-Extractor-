@@ -21,4 +21,7 @@ chmod +x ~/.shortcuts/Extractor.sh
 chmod +x ~/.shortcuts/updaterX.sh
 chmod +x ~/.shortcuts/vidX.sh
 
+# Print Readme.md
+./printReadme.sh
+
 echo "Extractor, updaterX, vidX have been updated and copied to ~/.shortcuts/"
