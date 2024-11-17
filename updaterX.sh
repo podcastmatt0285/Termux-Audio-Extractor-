@@ -54,3 +54,7 @@ chmod +x ~/.shortcuts/vidX.sh
 chmod +x Extractor.sh
 chmod +x updaterX.sh
 chmod +x vidX.sh
+
+# Ensure storage permissions are granted 
+cd ~/storage
+termux-setup-storage
