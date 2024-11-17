@@ -1,0 +1,1 @@
+[Check out the Supported Sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
