@@ -40,7 +40,7 @@ check_dependencies() {
             log "$pkg is already installed."
         fi
     done
-    
+
     # Install yt-dlp via pip
     log "Upgrading pip and installing yt-dlp"
     python -m pip install --upgrade pip
@@ -84,19 +84,22 @@ echo "Enter the YouTube playlist URL (default: https://music.youtube.com/playlis
 read -r YOUTUBE_PLAYLIST_URL
 YOUTUBE_PLAYLIST_URL=${YOUTUBE_PLAYLIST_URL:-https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=kmenK0-ShrP6mT74}
 
-ZIPFILE="$PLAYLIST_DIR.zip"
+read -r -p "Do you want to zip the downloaded MP4 files (y/N)? " zip_answer
+
+ZIPFILE="$FULL_PLAYLIST_DIR/$PLAYLIST_DIR.zip"
 LOGFILE="download.log"
 FAILED_LOG="failed.log"
 ERROR_SUMMARY="error_summary.log"
 VERBOSE=true
 FULL_PLAYLIST_DIR="$BASE_DIR/$PLAYLIST_DIR"
 
+# Ensure the base directory and playlist directory exist
+mkdir -p "$FULL_PLAYLIST_DIR" || handle_error "Failed to create directory $FULL_PLAYLIST_DIR"
+
 check_dependencies
 download_videos
 
-# Ask user if they want to zip the files after download
-read -r -p "Do you want to zip the downloaded MP4 files (y/N)? " zip_answer
-
+# Handle zipping based on user input
 if [[ "$zip_answer" =~ ^([Yy])$ ]]; then
     if [ -f "$ZIPFILE" ]; then
         log "ZIP file $ZIPFILE already exists. Removing it."
