@@ -69,7 +69,6 @@ download_videos() {
 }
 
 # Main script execution
-~/Termux-Audio-Extractor-
 termux-notification --title "Script Started" --content "The download script has started." --priority "high"
 
 # Variables
