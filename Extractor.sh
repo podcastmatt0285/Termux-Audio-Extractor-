@@ -67,7 +67,6 @@ download_audio() {
 }
 
 # Main script execution
-cd ~/Termux-Audio-Extractor-
 termux-notification --title "Script Started" --content "The download script has started."
 
 # Variables
