@@ -38,7 +38,7 @@ check_dependencies() {
             log "$pkg is already installed."
         fi
     done
-    
+
     # Install yt-dlp via pip
     log "Upgrading pip and installing yt-dlp"
     python -m pip install --upgrade pip
@@ -85,7 +85,6 @@ YOUTUBE_PLAYLIST_URL=${YOUTUBE_PLAYLIST_URL:-https://music.youtube.com/playlist?
 # Ask user if they want to zip the files immediately after URL input
 read -r -p "Do you want to zip the downloaded MP3 files (y/N)? " zip_answer
 
-ZIPFILE="$PLAYLIST_DIR.zip"
 LOGFILE="download.log"
 FAILED_LOG="failed.log"
 ERROR_SUMMARY="error_summary.log"
@@ -96,13 +95,15 @@ check_dependencies
 download_audio
 
 if [[ "$zip_answer" =~ ^([Yy])$ ]]; then
+    ZIPFILE="$FULL_PLAYLIST_DIR/$PLAYLIST_DIR.zip"  # Store ZIP in the playlist directory
+
     if [ -f "$ZIPFILE" ]; then
         log "ZIP file $ZIPFILE already exists. Removing it."
         rm "$ZIPFILE"
     fi
+
     if ls "$FULL_PLAYLIST_DIR"/*.mp3 1> /dev/null 2>&1; then
         zip -r "$ZIPFILE" "$FULL_PLAYLIST_DIR"/*.mp3 || handle_error "Failed to create ZIP file"
-        rm "$FULL_PLAYLIST_DIR"/*.mp3
         log "Zipped all MP3 files in $FULL_PLAYLIST_DIR into $ZIPFILE"
         termux-notification --title "Zipping Complete" --content "Zipped all MP3 files."
     fi
