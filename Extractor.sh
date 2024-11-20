@@ -85,9 +85,10 @@ YOUTUBE_PLAYLIST_URL=${YOUTUBE_PLAYLIST_URL:-https://music.youtube.com/playlist?
 # Ask user if they want to zip the files immediately after URL input
 read -r -p "Do you want to zip the downloaded MP3 files (y/N)? " zip_answer
 
-LOGFILE="download.log"
-FAILED_LOG="failed.log"
-ERROR_SUMMARY="error_summary.log"
+mkdir -p "$FULL_PLAYLIST_DIR/logs"
+LOGFILE="$FULL_PLAYLIST_DIR/logs/download.log"
+FAILED_LOG="$FULL_PLAYLIST_DIR/logs/failed.log"
+ERROR_SUMMARY="$FULL_PLAYLIST_DIR/logs/error_summary.log"
 VERBOSE=true
 FULL_PLAYLIST_DIR="$BASE_DIR/$PLAYLIST_DIR"
 
