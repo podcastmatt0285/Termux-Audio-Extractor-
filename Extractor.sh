@@ -107,6 +107,7 @@ if [[ "$zip_answer" =~ ^([Yy])$ ]]; then
         log "Zipped all MP3 files in $FULL_PLAYLIST_DIR into $ZIPFILE"
         termux-notification --title "Zipping Complete" --content "Zipped all MP3 files."
     fi
+ rm "$FULL_PLAYLIST_DIR"/*.mp3 || handle_error "Failed to delete original files"
 fi
 
 # Cleanup old logs and temporary files
