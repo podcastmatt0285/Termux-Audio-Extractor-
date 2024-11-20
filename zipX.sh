@@ -25,7 +25,7 @@ list_zip_files() {
     local zip_files=()
     for dir in "${directories[@]}"; do
         if [ -d "$dir" ]; then
-            zip_files+=($(find "$dir" -maxdepth 1 -name "*.zip"))
+            zip_files+=($(find "$dir" -type f -name "*.zip"))
         fi
     done
     echo "${zip_files[@]}"
@@ -34,7 +34,7 @@ list_zip_files() {
 # Function to list contents of a ZIP file
 list_zip_contents() {
     local zip_file=$1
-    unzip -Z1 "$zip_file" || handle_error "Unable to list contents of $zip_file" "$LOGFILE"
+    unzip -Z1 "$zip_file" | sed '/^$/d' || handle_error "Unable to list contents of $zip_file" "$LOGFILE"
 }
 
 # Main script execution
@@ -66,7 +66,11 @@ log "Selected ZIP file: $selected_zip" "$LOGFILE"
 
 # List contents of the selected ZIP file
 echo "Contents of $(basename "$selected_zip"):"
-zip_contents=($(list_zip_contents "$selected_zip"))
+zip_contents=()
+while IFS= read -r file; do
+    zip_contents+=("$file")
+done < <(list_zip_contents "$selected_zip")
+
 for i in "${!zip_contents[@]}"; do
     echo "$((i+1)). ${zip_contents[$i]}"
 done
