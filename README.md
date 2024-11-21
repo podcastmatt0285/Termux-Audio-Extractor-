@@ -1,160 +1,151 @@
-Installation and Setup Guide for Termux Audio Extractor
+Termux Audio Extractor
 
-1. Install Required Apps
+A collection of Termux scripts for extracting and managing audio and video content from YouTube playlists efficiently.
 
-Install Termux, Termux:API, and Termux:Widget from F-Droid or your app store.
+Features
+
+Audio Extraction: Download audio from YouTube playlists in MP3 format.
+
+Video Download: Download entire videos from YouTube.
+
+Automatic Updates: Keep your scripts and dependencies up-to-date.
+
+File Management: Organize downloaded files into directories and optionally compress them into ZIP files.
+
+Logs: Track successes and failures through detailed logs.
 
 
-2. Grant Termux Permissions
+Files and Scripts
 
-To allow Termux access to your device's storage, open Termux and run:
+1. Extractor.sh
 
-termux-setup-storage
+Main script for downloading audio files from YouTube playlists.
 
-This step is essential for saving downloaded files to your device.
+Converts videos into MP3 format and organizes them into directories.
 
-3. Clone the Repository
+Includes optional ZIP compression and automated cleanup.
 
-Install Git and download the repository:
 
-pkg install git
-git clone https://github.com/podcastmatt0285/Termux-Audio-Extractor-
+2. updaterX.sh
+
+Keeps the scripts and required dependencies updated.
+
+Checks for new versions of packages and installs them as needed.
+
+
+3. vidX.sh
+
+Downloads full videos from YouTube playlists.
+
+Organizes videos into directories.
+
+
+4. zipX.sh
+
+Compresses downloaded audio or video files into a ZIP archive.
+
+Cleans up original files after successful zipping.
+
+
+Prerequisites
+
+Termux app installed on your Android device.
+
+Storage permissions enabled for Termux.
+
+An active internet connection.
+
+
+Installation
+
+1. Clone the repository:
+
+git clone https://github.com/podcastmatt0285/Termux-Audio-Extractor-.git
+
+
+2. Navigate to the repository folder:
+
 cd Termux-Audio-Extractor-
 
-4. Execute the Updater Script
 
-Make the updater script executable and run it:
+3. Make the scripts executable:
 
-chmod +x updaterX.sh
-bash updaterX.sh
+chmod +x *.sh
 
-This script will install dependencies (e.g., yt-dlp, ffmpeg, and termux-api) and automatically set up the Termux Widget for easy access.
 
-5. Test the Widget
 
-Add a Termux Widget to your home screen:
+Usage
 
-1. Long-press on your home screen and select "Widgets."
+Extractor.sh
 
+Run the audio extraction script:
 
-2. Locate Termux:Widget and drag it to your desired location.
+./Extractor.sh
 
+Follow the prompts to:
 
+Set the base directory for downloads.
 
-Test the widget:
+Name the playlist directory.
 
-1. Tap the widget and select updaterX.sh to ensure dependencies are correctly installed.
+Provide the YouTube playlist URL.
 
+Decide whether to compress the files.
 
 
+updaterX.sh
 
-6. Run the Extractor Script
+Run the updater script to ensure all dependencies and scripts are up to date:
 
-From the widget, run Extractor.sh:
+./updaterX.sh
 
-1. Enter the required inputs as prompted:
+vidX.sh
 
-Base Directory: Save location for MP3 files. Defaults to /storage/music/termux.
+Download full videos from YouTube:
 
-Playlist Directory Name: Subfolder for organization. Defaults to Beat_That.
+./vidX.sh
 
-YouTube Playlist URL: Paste your playlist URL here.
+zipX.sh
 
-Zip Option: Enter y to compress files into a .zip.
+Manually compress downloaded files:
 
+./zipX.sh
 
+Logs
 
-2. The script will handle downloading, converting, and organizing the files.
+logs Directory: Created within your playlist folder.
 
+Log Files:
 
+download.log — General logs for downloads.
 
-7. Enjoy Your Audio
+failed.log — Records of failed downloads.
 
-Access the audio files in the specified directory.
 
 
+Cleanup
 
+Automatically deletes logs and temporary files older than 30 days during script execution.
 
-Installation and Setup Guide for vidX.sh
+Manually triggered cleanup available within some scripts.
 
-1. Install Required Apps
 
-Download Termux, Termux:API, and Termux:Widget from F-Droid or your app store.
+License
 
+This project is licensed under the MIT License.
 
-2. Grant Termux Permissions
 
-Run the following command in Termux to enable storage access:
+---
 
-termux-setup-storage
+Next Steps:
 
-3. Clone the Repository
+1. Ensure File Descriptions Are Accurate: Double-check if each script performs as described.
 
-Install Git and download the project files:
 
-pkg install git
-git clone https://github.com/podcastmatt0285/Termux-Audio-Extractor-
-cd Termux-Audio-Extractor-
+2. Check Dependencies: If specific scripts require additional tools or packages, include them in the README.
 
-4. Run the Updater Script
 
-Make the updater script executable and run it:
+3. Add Examples (Optional): Include example outputs or use cases to guide users further.
 
-chmod +x updaterX.sh
-bash updaterX.sh
 
-This installs necessary dependencies and configures the environment.
-
-5. Test the Widget
-
-Add the Termux Widget to your home screen.
-
-Test the widget by running updaterX.sh from it to confirm setup.
-
-6. Run vidX.sh
-
-From the Termux Widget, execute vidX.sh and follow the prompts:
-
-1. Enter the Base Directory where videos will be stored. Default: /storage/videos/termux.
-
-
-2. Specify the Playlist Directory Name to organize downloads.
-
-
-3. Provide the YouTube Playlist URL for the videos you wish to download.
-
-
-4. Choose whether to compress the downloaded files into a ZIP archive (enter y for yes or n for no).
-
-
-
-7. Access Your Videos
-
-Downloaded (and optionally zipped) video files will be organized in the specified directory.
-
-
-
-Installation and Usage Guide for updaterX.sh
-
-1. Run the Script
-
-To update and sync the latest changes for the Termux scripts, run:
-
-bash updaterX.sh
-
-2. What the Script Does
-
-Ensures the ~/.shortcuts/ directory exists for Termux Widget scripts.
-
-Resets local changes to Extractor.sh, updaterX.sh, and vidX.sh.
-
-Pulls the latest changes from the repository.
-
-Copies updated scripts into the ~/.shortcuts/ directory.
-
-Sets the scripts as executable for Termux Widget.
-
-
-3. Verify the Update
-
-Ensure the latest versions of the scripts are present in the ~/.shortcuts/ directory and accessible from the Termux Widget.
+4. Contributing Section (Optional): Encourage others to contribute, report issues, or suggest improvements.
