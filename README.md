@@ -1,60 +1,79 @@
 Termux Audio Extractor
 
-A collection of Termux scripts for extracting and managing audio and video content from YouTube playlists efficiently.
+A collection of powerful Termux scripts for downloading and managing audio and video content from YouTube. The scripts provide efficient tools for extracting media, compressing files, and keeping everything organized.
+
+
+---
 
 Features
 
-Audio Extraction: Download audio from YouTube playlists in MP3 format.
+Audio Extraction: Download audio in MP3 format from YouTube playlists.
 
-Video Download: Download entire videos from YouTube.
+Video Download: Fetch entire videos from YouTube.
 
-Automatic Updates: Keep your scripts and dependencies up-to-date.
+Auto-Updating: Keep scripts and required dependencies up-to-date.
 
-File Management: Organize downloaded files into directories and optionally compress them into ZIP files.
+File Compression: Zip downloaded media files for easy sharing.
 
-Logs: Track successes and failures through detailed logs.
+Organized Logs: Track successes and failures with detailed logs.
+
+Automated Cleanup: Remove old logs and temporary files to save space.
 
 
-Files and Scripts
 
-1. Extractor.sh
+---
+
+Files in the Repository
+
+Extractor.sh
 
 Main script for downloading audio files from YouTube playlists.
 
-Converts videos into MP3 format and organizes them into directories.
+Features include:
 
-Includes optional ZIP compression and automated cleanup.
+MP3 extraction with metadata.
 
+Directory-based file organization.
 
-2. updaterX.sh
-
-Keeps the scripts and required dependencies updated.
-
-Checks for new versions of packages and installs them as needed.
+Optional ZIP compression and automated cleanup.
 
 
-3. vidX.sh
 
-Downloads full videos from YouTube playlists.
+updaterX.sh
 
-Organizes videos into directories.
+Handles updates for scripts and dependencies.
+
+Ensures required packages and tools are up-to-date.
 
 
-4. zipX.sh
+vidX.sh
 
-Compresses downloaded audio or video files into a ZIP archive.
+Script for downloading full video files from YouTube playlists.
 
-Cleans up original files after successful zipping.
+Saves videos in organized directories for easy access.
 
+
+zipX.sh
+
+Compresses downloaded files into a ZIP archive.
+
+Cleans up original files after successful zipping to save space.
+
+
+
+---
 
 Prerequisites
 
-Termux app installed on your Android device.
+Termux: Installed on your Android device.
 
-Storage permissions enabled for Termux.
+Permissions: Storage permissions enabled for Termux.
 
-An active internet connection.
+Internet Connection: Required for downloading media and dependencies.
 
+
+
+---
 
 Installation
 
@@ -63,22 +82,25 @@ Installation
 git clone https://github.com/podcastmatt0285/Termux-Audio-Extractor-.git
 
 
-2. Navigate to the repository folder:
+2. Navigate to the folder:
 
 cd Termux-Audio-Extractor-
 
 
-3. Make the scripts executable:
+3. Make all scripts executable:
 
 chmod +x *.sh
 
 
 
-Usage
 
-Extractor.sh
+---
 
-Run the audio extraction script:
+Usage Instructions
+
+Run Audio Extraction
+
+Use Extractor.sh to download audio files from YouTube playlists:
 
 ./Extractor.sh
 
@@ -86,66 +108,58 @@ Follow the prompts to:
 
 Set the base directory for downloads.
 
-Name the playlist directory.
+Name the playlist folder.
 
 Provide the YouTube playlist URL.
 
-Decide whether to compress the files.
+Optionally zip the audio files after downloading.
 
 
-updaterX.sh
+Update Scripts and Dependencies
 
-Run the updater script to ensure all dependencies and scripts are up to date:
+Keep scripts and packages up to date with updaterX.sh:
 
 ./updaterX.sh
 
-vidX.sh
+Download Videos
 
-Download full videos from YouTube:
+Use vidX.sh to download videos from YouTube playlists:
 
 ./vidX.sh
 
-zipX.sh
+Compress Files
 
-Manually compress downloaded files:
+Use zipX.sh to compress downloaded media into a ZIP file:
 
 ./zipX.sh
 
+
+---
+
+Logs and Cleanup
+
 Logs
 
-logs Directory: Created within your playlist folder.
+Logs are saved in the logs directory within your chosen playlist folder:
 
-Log Files:
+download.log: Records successful downloads.
 
-download.log — General logs for downloads.
-
-failed.log — Records of failed downloads.
+failed.log: Logs failed downloads.
 
 
 
 Cleanup
 
-Automatically deletes logs and temporary files older than 30 days during script execution.
+Automatically deletes old logs and temporary files (older than 30 days) during script execution.
 
-Manually triggered cleanup available within some scripts.
+Manual cleanup can be performed by running the appropriate functions in the scripts.
 
+
+
+---
 
 License
 
 This project is licensed under the MIT License.
 
 
----
-
-Next Steps:
-
-1. Ensure File Descriptions Are Accurate: Double-check if each script performs as described.
-
-
-2. Check Dependencies: If specific scripts require additional tools or packages, include them in the README.
-
-
-3. Add Examples (Optional): Include example outputs or use cases to guide users further.
-
-
-4. Contributing Section (Optional): Encourage others to contribute, report issues, or suggest improvements.
