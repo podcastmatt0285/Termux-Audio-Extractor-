@@ -161,5 +161,3 @@ Manual cleanup can be performed by running the appropriate functions in the scri
 License
 
 This project is licensed under the MIT License.
-
-
