@@ -27,7 +27,7 @@ handle_error() {
 # Function to check dependencies
 check_dependencies() {
     log "Checking and installing dependencies"
-    for pkg in python python-pip jq termux-api; do
+    for pkg in python python-pip jq zip unzip termux-api; do
         if ! command -v $pkg &> /dev/null; then
             log "$pkg is not installed. Installing..."
             pkg install $pkg -y || handle_error "Failed to install $pkg"
@@ -46,20 +46,36 @@ check_dependencies() {
     }
 }
 
-# Function to synchronize playlist
+# Function to extract ZIP file if present
+extract_zip_if_present() {
+    ZIPFILE="$PLAYLIST_DIR/$PLAYLIST_NAME.zip"
+
+    if [ -f "$ZIPFILE" ]; then
+        log "Found ZIP file: $ZIPFILE. Extracting contents for comparison."
+        TEMP_DIR="$PLAYLIST_DIR/temp_extracted"
+        mkdir -p "$TEMP_DIR"
+        unzip -o "$ZIPFILE" -d "$TEMP_DIR" || handle_error "Failed to extract ZIP file"
+        log "ZIP file extracted to $TEMP_DIR"
+    else
+        log "No ZIP file found. Continuing with current directory contents."
+    fi
+}
+
+# Function to compare and synchronize playlist
 sync_playlist() {
-    log "Starting playlist sync"
+    log "Starting playlist synchronization"
 
     # Temporary files for playlists
     local_playlist="$PLAYLIST_DIR/local_playlist.txt"
     online_playlist="$PLAYLIST_DIR/online_playlist.txt"
 
-    # Ensure directories exist
-    mkdir -p "$PLAYLIST_DIR/logs"
-
-    # Generate list of local MP3 files
+    # Generate list of local MP3 files (from ZIP if extracted, or directly from directory)
     log "Generating local playlist"
-    find "$PLAYLIST_DIR" -type f -name "*.mp3" -exec basename {} \; > "$local_playlist"
+    if [ -d "$TEMP_DIR" ]; then
+        find "$TEMP_DIR" -type f -name "*.mp3" -exec basename {} \; > "$local_playlist"
+    else
+        find "$PLAYLIST_DIR" -type f -name "*.mp3" -exec basename {} \; > "$local_playlist"
+    fi
 
     # Fetch online playlist
     log "Fetching online playlist"
@@ -69,10 +85,14 @@ sync_playlist() {
     }
 
     # Remove files no longer in the YouTube playlist
-    log "Removing files no longer in the online playlist"
+    log "Removing files not in the online playlist"
     while IFS= read -r track; do
         if ! grep -qxF "$track" "$online_playlist"; then
-            rm "$PLAYLIST_DIR/$track" && log "Removed $track" || log "Failed to remove $track"
+            if [ -d "$TEMP_DIR" ]; then
+                rm "$TEMP_DIR/$track" && log "Removed $track from extracted files" || log "Failed to remove $track"
+            else
+                rm "$PLAYLIST_DIR/$track" && log "Removed $track from playlist directory" || log "Failed to remove $track"
+            fi
         fi
     done < "$local_playlist"
 
@@ -81,7 +101,11 @@ sync_playlist() {
     yt-dlp -x --audio-format mp3 -N 4 -o "$PLAYLIST_DIR/%(title)s.%(ext)s" "$YOUTUBE_PLAYLIST_URL" \
         --exec "termux-notification --title 'Downloading' --content 'Downloading: %(title)s'" || handle_error "Failed to download new tracks"
 
-    log "Playlist sync completed successfully"
+    # Update ZIP file with the synchronized playlist
+    log "Updating ZIP file"
+    rm -f "$ZIPFILE" || handle_error "Failed to remove old ZIP file"
+    zip -r "$ZIPFILE" "$PLAYLIST_DIR"/*.mp3 || handle_error "Failed to create new ZIP file"
+    log "ZIP file updated successfully"
 }
 
 # Main script execution
@@ -93,20 +117,30 @@ read -r BASE_DIR
 BASE_DIR=${BASE_DIR:-/data/data/com.termux/files/home/storage/music/termux}
 
 echo "Enter the playlist directory name (default: Beat_That):"
-read -r PLAYLIST_DIR
-PLAYLIST_DIR=${PLAYLIST_DIR:-Beat_That}
+read -r PLAYLIST_NAME
+PLAYLIST_NAME=${PLAYLIST_NAME:-Beat_That}
 
 echo "Enter the YouTube playlist URL:"
 read -r YOUTUBE_PLAYLIST_URL
 
-PLAYLIST_DIR="$BASE_DIR/$PLAYLIST_DIR"
+PLAYLIST_DIR="$BASE_DIR/$PLAYLIST_NAME"
 LOGFILE="$PLAYLIST_DIR/logs/sync.log"
 FAILED_LOG="$PLAYLIST_DIR/logs/failed.log"
 VERBOSE=true
+TEMP_DIR=""
 
 # Ensure playlist directory exists
-mkdir -p "$PLAYLIST_DIR" || handle_error "Failed to create directory $PLAYLIST_DIR"
+mkdir -p "$PLAYLIST_DIR/logs" || handle_error "Failed to create directory $PLAYLIST_DIR/logs"
 
-# Check dependencies and perform synchronization
+# Check dependencies, extract ZIP if present, and synchronize playlist
 check_dependencies
+extract_zip_if_present
 sync_playlist
+
+# Clean up temporary extraction directory if used
+if [ -d "$TEMP_DIR" ]; then
+    rm -rf "$TEMP_DIR" || log "Failed to clean up temporary directory"
+    log "Temporary extraction directory cleaned up"
+fi
+
+log "playlistSyncX.sh completed successfully"
