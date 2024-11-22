@@ -84,6 +84,12 @@ echo "Enter the YouTube playlist URL (default: https://music.youtube.com/playlis
 read -r YOUTUBE_PLAYLIST_URL
 YOUTUBE_PLAYLIST_URL=${YOUTUBE_PLAYLIST_URL:-https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=kmenK0-ShrP6mT74}
 
+# After reading the YouTube playlist URL
+YOUTUBE_PLAYLIST_URL=${YOUTUBE_PLAYLIST_URL:-https://music.youtube.com/playlist?list=PLPHx1a3AKEWnVvtndzIUBtMfeiM6WCXds&si=kmenK0-ShrP6mT74}
+
+# Save the URL to a configuration file
+echo "YOUTUBE_PLAYLIST_URL=$YOUTUBE_PLAYLIST_URL" > "$FULL_PLAYLIST_DIR/playlist_config.conf"
+
 read -r -p "Do you want to zip the downloaded MP4 files (y/N)? " zip_answer
 
 mkdir -p "$FULL_PLAYLIST_DIR/logs"
