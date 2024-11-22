@@ -35,29 +35,17 @@ mkdir ~/.shortcuts/
 cd ~/Termux-Audio-Extractor-
 
 # Discard any local changes to Extractor.sh
-git checkout -- Extractor.sh
-git checkout -- updaterX.sh
-git checkout -- vidX.sh
-git checkout -- zipX.sh
+git checkout -- *.sh
 
 # Pull the latest changes from the repository
 git pull
 
 # Copy the updated scripts to the shortcuts directory
-cp Extractor.sh ~/.shortcuts/
-cp updaterX.sh ~/.shortcuts/
-cp vidX.sh ~/.shortcuts/
-cp zipX.sh ~/.shortcuts/
+cp *.sh ~/.shortcuts/
 
 # Ensure the scripts are executable
-chmod +x ~/.shortcuts/Extractor.sh
-chmod +x ~/.shortcuts/updaterX.sh
-chmod +x ~/.shortcuts/vidX.sh
-chmod +x ~/.shortcuts/zipX.sh
-chmod +x Extractor.sh
-chmod +x updaterX.sh
-chmod +x vidX.sh
-chmod +x zipX.sh
+chmod +x ~/.shortcuts/*.sh
+chmod +x *.sh
 
 # Ensure storage permissions are granted 
 cd ~/storage
