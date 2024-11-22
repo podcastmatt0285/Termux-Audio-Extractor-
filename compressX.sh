@@ -2,144 +2,124 @@
 
 # Function to log messages
 log() {
+    if [ -z "$LOGFILE" ]; then
+        echo "ERROR: LOGFILE variable is not set."
+        exit 1
+    fi
     local message="$1"
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $message" | tee -a "$LOGFILE"
 }
 
+# Error handler
 handle_error() {
     log "ERROR: $1"
     exit 1
 }
 
-# Function to check dependencies
+# Check dependencies
 check_dependencies() {
     log "Checking for required dependencies..."
     for tool in zip tar 7z; do
         if ! command -v "$tool" &>/dev/null; then
             log "$tool is not installed. Installing..."
-            pkg install "$tool" -y || handle_error "Failed to install $tool"
+            case "$tool" in
+                7z)
+                    pkg install p7zip -y || handle_error "Failed to install $tool (use 'pkg install p7zip-full' if necessary)."
+                    ;;
+                *)
+                    pkg install "$tool" -y || handle_error "Failed to install $tool"
+                    ;;
+            esac
         else
             log "$tool is already installed."
         fi
     done
 }
 
-# Function to display directories and allow selection
+# Display directories for user selection
 select_directory() {
+    log "Listing available directories..."
     local dirs=()
-    local index=1
-
-    log "Searching for directories in ~/storage/music/termux and ~/storage/movies/termux..."
-    while IFS= read -r -d $'\0' dir; do
+    while IFS= read -r -d '' dir; do
         dirs+=("$dir")
-    done < <(find ~/storage/{music/movies}/termux -type d -print0)
-
-    if [ "${#dirs[@]}" -eq 0 ]; then
-        handle_error "No directories found to compress."
-    fi
+    done < <(find ~/storage/music/termux ~/storage/movies/termux -type d -print0)
 
     echo "Select a directory to compress:"
-    for dir in "${dirs[@]}"; do
-        echo "$index) $dir"
-        ((index++))
+    for i in "${!dirs[@]}"; do
+        echo "$((i + 1))) ${dirs[i]}"
     done
 
-    read -r selection
-    if [[ "$selection" =~ ^[0-9]+$ ]] && [ "$selection" -ge 1 ] && [ "$selection" -le "${#dirs[@]}" ]; then
-        echo "${dirs[$((selection - 1))]}"
-    else
-        handle_error "Invalid selection."
+    read -rp "Enter the number of your choice: " choice
+    if [[ ! "$choice" =~ ^[0-9]+$ ]] || ((choice < 1 || choice > ${#dirs[@]})); then
+        handle_error "Invalid selection. Please run the script again."
     fi
+
+    SELECTED_DIR="${dirs[$((choice - 1))]}"
+    log "Selected directory: $SELECTED_DIR"
 }
 
-# Function to decompress if necessary
+# Decompress existing compressed files if necessary
 decompress_if_needed() {
-    local path="$1"
-    if [[ "$path" =~ \.(zip|tar\.gz|7z)$ ]]; then
-        log "Decompressing $path..."
-        case "$path" in
-            *.zip) unzip "$path" -d "${path%.*}" || handle_error "Failed to decompress $path" ;;
-            *.tar.gz) tar -xzf "$path" -C "${path%.*}" || handle_error "Failed to decompress $path" ;;
-            *.7z) 7z x "$path" -o"${path%.*}" || handle_error "Failed to decompress $path" ;;
-            *) handle_error "Unsupported compression format for decompression: $path" ;;
+    local compressed_file
+    compressed_file=$(find "$SELECTED_DIR" -maxdepth 1 -type f -name "*.zip" -o -name "*.tar.gz" -o -name "*.7z" | head -n 1)
+    if [ -n "$compressed_file" ]; then
+        log "Found existing compressed file: $compressed_file. Decompressing..."
+        case "$compressed_file" in
+            *.zip) unzip "$compressed_file" -d "$SELECTED_DIR" || handle_error "Failed to decompress $compressed_file" ;;
+            *.tar.gz) tar -xzf "$compressed_file" -C "$SELECTED_DIR" || handle_error "Failed to decompress $compressed_file" ;;
+            *.7z) 7z x "$compressed_file" -o"$SELECTED_DIR" || handle_error "Failed to decompress $compressed_file" ;;
+            *) handle_error "Unsupported compression format for $compressed_file" ;;
         esac
-        echo "${path%.*}"  # Return the decompressed directory
+        rm "$compressed_file" || handle_error "Failed to remove $compressed_file after decompression"
+        log "Decompression completed."
     else
-        echo "$path"  # Return the original directory if no decompression was needed
+        log "No existing compressed file found in $SELECTED_DIR."
     fi
 }
 
-# Function to compress a directory
-compress() {
-    local input_path="$1"
-    local format="$2"
-    local level="$3"
-
-    LOGFILE="$input_path/compressX.log"  # Log file in the same directory as the compressed file
-    local output_file
+# Perform compression
+compress_directory() {
+    read -rp "Choose compression format (zip/tar.gz/7z): " format
+    read -rp "Choose compression level (low/medium/high): " level
 
     case "$format" in
-        zip)
-            output_file="$input_path.zip"
-            case "$level" in
-                low) zip -1 -r "$output_file" "$input_path" ;;
-                medium) zip -5 -r "$output_file" "$input_path" ;;
-                high) zip -9 -r "$output_file" "$input_path" ;;
-                *) handle_error "Invalid compression level: $level" ;;
-            esac
-            ;;
-        tar.gz)
-            output_file="$input_path.tar.gz"
-            case "$level" in
-                low) tar -czf "$output_file" --fast "$input_path" ;;
-                medium) tar -czf "$output_file" "$input_path" ;;
-                high) tar -czf "$output_file" --best "$input_path" ;;
-                *) handle_error "Invalid compression level: $level" ;;
-            esac
-            ;;
-        7z)
-            output_file="$input_path.7z"
-            case "$level" in
-                low) 7z a -mx=1 "$output_file" "$input_path" ;;
-                medium) 7z a -mx=5 "$output_file" "$input_path" ;;
-                high) 7z a -mx=9 "$output_file" "$input_path" ;;
-                *) handle_error "Invalid compression level: $level" ;;
-            esac
-            ;;
-        *)
-            handle_error "Unsupported format: $format"
-            ;;
+        zip) compression_command=("zip" "-r") ;;
+        tar.gz) compression_command=("tar" "-czf") ;;
+        7z) compression_command=("7z" "a") ;;
+        *) handle_error "Invalid format: $format" ;;
     esac
 
-    log "Compression completed: $output_file"
-    echo "Compressed file saved as: $output_file"
+    case "$level" in
+        low) compression_args=("-1") ;;
+        medium) compression_args=("-5") ;;
+        high) compression_args=("-9") ;;
+        *) handle_error "Invalid compression level: $level" ;;
+    esac
+
+    OUTPUT_FILE="$SELECTED_DIR.$format"
+    LOGFILE="$SELECTED_DIR/compressX.log"
+    log "Compressing $SELECTED_DIR into $OUTPUT_FILE with $format format and $level compression level..."
+
+    if [ "$format" = "tar.gz" ]; then
+        tar -czf "$OUTPUT_FILE" "${compression_args[@]}" "$SELECTED_DIR" || handle_error "Failed to compress directory"
+    else
+        "${compression_command[@]}" "$OUTPUT_FILE" "${compression_args[@]}" "$SELECTED_DIR" || handle_error "Failed to compress directory"
+    fi
+
+    log "Compression completed successfully. File saved as $OUTPUT_FILE"
 }
 
 # Main script execution
 main() {
+    LOGFILE="/data/data/com.termux/files/home/compressX.log"
+
+    log "Starting compression script..."
     check_dependencies
+    select_directory
+    decompress_if_needed
+    compress_directory
 
-    local selected_path
-    selected_path=$(select_directory)  # User selects a directory or compressed file
-
-    # Decompress if necessary
-    selected_path=$(decompress_if_needed "$selected_path")
-
-    echo "Choose compression format (zip, tar.gz, 7z):"
-    read -r format
-    case "$format" in
-        zip|tar.gz|7z) ;;
-        *) handle_error "Invalid format: $format" ;;
-    esac
-
-    echo "Choose compression level (low, medium, high):"
-    read -r level
-    case "$level" in
-        low|medium|high) ;;
-        *) handle_error "Invalid level: $level" ;;
-    esac
-
-    compress "$selected_path" "$format" "$level"
+    log "Script completed successfully."
 }
 
 main "$@"
