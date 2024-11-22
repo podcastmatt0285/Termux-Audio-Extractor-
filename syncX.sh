@@ -3,7 +3,6 @@
 # Function to log messages
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOGFILE"
-    termux-notification --title "Log Entry" --content "$1"
 }
 
 # Function to handle errors
@@ -30,8 +29,8 @@ check_dependencies() {
     python -m pip install -U yt-dlp || handle_error "Failed to update yt-dlp"
 }
 
-# Function to extract a ZIP file if it exists
-extract_zip() {
+# Function to extract a ZIP file if it exists and rezip afterward
+process_zip() {
     if [ -f "${PLAYLIST_DIR}.zip" ]; then
         log "Found ZIP file in playlist directory. Extracting contents..."
         TEMP_DIR=$(mktemp -d)
@@ -40,6 +39,18 @@ extract_zip() {
     else
         log "No ZIP file found. Continuing without extraction."
         TEMP_DIR=""
+    fi
+}
+
+# Function to rezip the temporary directory if it was used
+rezip_temp_dir() {
+    if [ -n "$TEMP_DIR" ]; then
+        log "Re-zipping contents of the temporary directory back to ${PLAYLIST_DIR}.zip"
+        cd "$TEMP_DIR" || handle_error "Failed to change directory to $TEMP_DIR"
+        zip -r "${PLAYLIST_DIR}.zip" . || handle_error "Failed to rezip contents"
+        cd - || handle_error "Failed to return to the original directory"
+        rm -rf "$TEMP_DIR"
+        log "Re-zipping complete."
     fi
 }
 
@@ -96,14 +107,29 @@ remove_outdated_tracks() {
     fi
 }
 
+# Function to list and select subdirectories
+select_subdirectory() {
+    log "Listing available directories in ~/storage/music/termux and ~/storage/movies/termux:"
+    dirs=(~/storage/music/termux/* ~/storage/movies/termux/*)
+    for i in "${!dirs[@]}"; do
+        echo "$((i+1))) ${dirs[i]}"
+    done
+
+    echo "Enter the number corresponding to the directory you want to use:"
+    read -r dir_number
+    if [ "$dir_number" -ge 1 ] && [ "$dir_number" -le "${#dirs[@]}" ]; then
+        PLAYLIST_DIR="${dirs[$((dir_number-1))]}"
+        log "Selected directory: $PLAYLIST_DIR"
+    else
+        handle_error "Invalid selection. Exiting."
+    fi
+}
+
 # Main script execution
 log "Starting playlistSyncX script"
 
 # User inputs
-echo "Enter the playlist directory (default: ~/storage/music/termux):"
-read -r PLAYLIST_DIR
-PLAYLIST_DIR=${PLAYLIST_DIR:-~/storage/music/termux}
-
+select_subdirectory
 echo "Enter the YouTube playlist URL:"
 read -r YOUTUBE_PLAYLIST_URL
 
@@ -117,15 +143,15 @@ tracks_to_remove="$PLAYLIST_DIR/tracks_to_remove.txt"
 
 # Run script logic
 check_dependencies
-extract_zip
+process_zip
 sync_playlists
 download_new_tracks
 remove_outdated_tracks
+rezip_temp_dir
 
 # Cleanup
 log "Cleaning up temporary files"
 rm -f "$online_playlist" "$local_playlist" "$tracks_to_download" "$tracks_to_remove"
-[ -n "$TEMP_DIR" ] && rm -rf "$TEMP_DIR"
 
 log "playlistSyncX script completed successfully"
 termux-notification --title "Sync Complete" --content "Playlist synchronization complete."
