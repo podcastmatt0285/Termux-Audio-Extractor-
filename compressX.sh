@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Base directory for music
+BASE_DIR="$HOME/storage/music/termux"
+
 # Function to log messages
 log() {
     if [ -z "$LOGFILE" ]; then
@@ -42,7 +45,7 @@ select_directory() {
     local dirs=()
     while IFS= read -r -d '' dir; do
         dirs+=("$dir")
-    done < <(find ~/storage/music/termux ~/storage/movies/termux -type d -print0)
+    done < <(find "$BASE_DIR" -type d -print0)
 
     echo "Select a directory to compress:"
     for i in "${!dirs[@]}"; do
@@ -105,7 +108,7 @@ compress_directory() {
     esac
 
     OUTPUT_FILE="$SELECTED_DIR.$format"
-    LOGFILE="$SELECTED_DIR/compressX.log"
+    LOGFILE="$BASE_DIR/compressX.log"
     log "Compressing $SELECTED_DIR into $OUTPUT_FILE with $format format and $level compression level..."
 
     if [ "$format" = "tar.gz" ]; then
@@ -121,7 +124,7 @@ compress_directory() {
 
 # Main script execution
 main() {
-    LOGFILE="~/compressX.log"
+    LOGFILE="$BASE_DIR/compressX.log"
 
     log "Starting compression script..."
     check_dependencies
