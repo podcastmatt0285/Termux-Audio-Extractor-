@@ -121,7 +121,7 @@ compress_directory() {
 
 # Main script execution
 main() {
-    LOGFILE="/data/data/com.termux/files/home/compressX.log"
+    LOGFILE="~/compressX.log"
 
     log "Starting compression script..."
     check_dependencies
