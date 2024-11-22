@@ -90,10 +90,18 @@ compress_directory() {
     esac
 
     case "$level" in
-        low) compression_args=("-1") ;;
-        medium) compression_args=("-5") ;;
-        high) compression_args=("-9") ;;
-        *) handle_error "Invalid compression level: $level" ;;
+        low)
+            compression_args=("-mx=1") # For 7z, low level compression
+            ;;
+        medium)
+            compression_args=("-mx=5") # For 7z, medium level compression
+            ;;
+        high)
+            compression_args=("-mx=9") # For 7z, high level compression
+            ;;
+        *)
+            handle_error "Invalid compression level: $level"
+            ;;
     esac
 
     OUTPUT_FILE="$SELECTED_DIR.$format"
@@ -102,6 +110,8 @@ compress_directory() {
 
     if [ "$format" = "tar.gz" ]; then
         tar -czf "$OUTPUT_FILE" "${compression_args[@]}" "$SELECTED_DIR" || handle_error "Failed to compress directory"
+    elif [ "$format" = "7z" ]; then
+        "${compression_command[@]}" "$OUTPUT_FILE" "${compression_args[@]}" "$SELECTED_DIR" || handle_error "Failed to compress directory"
     else
         "${compression_command[@]}" "$OUTPUT_FILE" "${compression_args[@]}" "$SELECTED_DIR" || handle_error "Failed to compress directory"
     fi
