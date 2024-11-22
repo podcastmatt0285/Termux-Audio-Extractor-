@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Base directories for searching
-BASE_DIRS=("$HOME/storage/music/termux" "$HOME/storage/movies/termux")
+# Base directory for your files
+BASE_DIR="$HOME/storage/music/termux"
 
 # Function to log messages
 log() {
@@ -39,61 +39,61 @@ check_dependencies() {
     done
 }
 
-# Display compressed files for user selection
-select_compressed_file() {
-    log "Listing available compressed files..."
-    local files=()
-    for base_dir in "${BASE_DIRS[@]}"; do
-        while IFS= read -r -d '' file; do
-            files+=("$file")
-        done < <(find "$base_dir" -type f \( -name "*.zip" -o -name "*.tar.gz" -o -name "*.7z" \) -print0)
-    done
+# Display directories for user selection
+select_directory() {
+    log "Listing available directories..."
+    local dirs=()
+    while IFS= read -r -d '' dir; do
+        dirs+=("$dir")
+    done < <(find "$BASE_DIR" -type d -print0)
 
-    echo "Select a file to decompress:"
-    for i in "${!files[@]}"; do
-        echo "$((i + 1))) ${files[i]}"
+    echo "Select a directory to decompress:"
+    for i in "${!dirs[@]}"; do
+        echo "$((i + 1))) ${dirs[i]}"
     done
 
     read -rp "Enter the number of your choice: " choice
-    if [[ ! "$choice" =~ ^[0-9]+$ ]] || ((choice < 1 || choice > ${#files[@]})); then
+    if [[ ! "$choice" =~ ^[0-9]+$ ]] || ((choice < 1 || choice > ${#dirs[@]})); then
         handle_error "Invalid selection. Please run the script again."
     fi
 
-    SELECTED_FILE="${files[$((choice - 1))]}"
-    log "Selected file: $SELECTED_FILE"
+    SELECTED_DIR="${dirs[$((choice - 1))]}"
+    log "Selected directory: $SELECTED_DIR"
 }
 
-# Decompress the selected file
-decompress_file() {
-    log "Decompressing $SELECTED_FILE..."
+# Decompress files in the selected directory and subdirectories
+decompress_files() {
+    log "Searching for compressed files in $SELECTED_DIR and subdirectories..."
 
-    case "$SELECTED_FILE" in
-        *.zip)
-            unzip "$SELECTED_FILE" -d "$(dirname "$SELECTED_FILE")" || handle_error "Failed to decompress $SELECTED_FILE"
-            ;;
-        *.tar.gz)
-            tar -xzf "$SELECTED_FILE" -C "$(dirname "$SELECTED_FILE")" || handle_error "Failed to decompress $SELECTED_FILE"
-            ;;
-        *.7z)
-            7z x "$SELECTED_FILE" -o"$(dirname "$SELECTED_FILE")" || handle_error "Failed to decompress $SELECTED_FILE"
-            ;;
-        *)
-            handle_error "Unsupported compression format for $SELECTED_FILE"
-            ;;
-    esac
-
-    rm "$SELECTED_FILE" || handle_error "Failed to remove $SELECTED_FILE after decompression"
-    log "Decompression of $SELECTED_FILE completed."
+    find "$SELECTED_DIR" -type f \( -name "*.zip" -o -name "*.tar.gz" -o -name "*.7z" \) | while read -r file; do
+        log "Found compressed file: $file. Decompressing..."
+        case "$file" in
+            *.zip)
+                unzip "$file" -d "$(dirname "$file")" || handle_error "Failed to decompress $file"
+                ;;
+            *.tar.gz)
+                tar -xzf "$file" -C "$(dirname "$file")" || handle_error "Failed to decompress $file"
+                ;;
+            *.7z)
+                7z x "$file" -o"$(dirname "$file")" || handle_error "Failed to decompress $file"
+                ;;
+            *)
+                handle_error "Unsupported compression format for $file"
+                ;;
+        esac
+        rm "$file" || handle_error "Failed to remove $file after decompression"
+        log "Decompression of $file completed."
+    done
 }
 
 # Main script execution
 main() {
-    LOGFILE="$HOME/decompressX.log"
+    LOGFILE="$BASE_DIR/decompressX.log"
 
     log "Starting decompression script..."
     check_dependencies
-    select_compressed_file
-    decompress_file
+    select_directory
+    decompress_files
 
     log "Script completed successfully."
 }
