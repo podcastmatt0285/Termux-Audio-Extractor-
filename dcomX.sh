@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Base directory for your files
-BASE_DIR="$HOME/storage/music/termux"
+# Base directories for searching
+BASE_DIRS=("$HOME/storage/music/termux" "$HOME/storage/movies/termux")
 
 # Function to log messages
 log() {
@@ -43,9 +43,11 @@ check_dependencies() {
 select_directory() {
     log "Listing available directories..."
     local dirs=()
-    while IFS= read -r -d '' dir; do
-        dirs+=("$dir")
-    done < <(find "$BASE_DIR" -type d -print0)
+    for base_dir in "${BASE_DIRS[@]}"; do
+        while IFS= read -r -d '' dir; do
+            dirs+=("$dir")
+        done < <(find "$base_dir" -type d -print0)
+    done
 
     echo "Select a directory to decompress:"
     for i in "${!dirs[@]}"; do
@@ -88,7 +90,7 @@ decompress_files() {
 
 # Main script execution
 main() {
-    LOGFILE="$BASE_DIR/decompressX.log"
+    LOGFILE="$HOME/decompressX.log"
 
     log "Starting decompression script..."
     check_dependencies
