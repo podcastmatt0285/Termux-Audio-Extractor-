@@ -17,9 +17,9 @@ handle_error() {
 check_dependencies() {
     log "Checking for required dependencies"
     for pkg in python python-pip zip ffmpeg termux-api; do
-        if ! command -v $pkg &> /dev/null; then
+        if ! command -v "$pkg" &> /dev/null; then
             log "Installing missing package: $pkg"
-            pkg install $pkg -y || handle_error "Failed to install $pkg"
+            pkg install "$pkg" -y || handle_error "Failed to install $pkg"
         else
             log "$pkg is already installed."
         fi
@@ -32,10 +32,10 @@ check_dependencies() {
 
 # Function to extract a ZIP file if it exists
 extract_zip() {
-    if [ -f "$PLAYLIST_DIR/$PLAYLIST_DIR.zip" ]; then
+    if [ -f "${PLAYLIST_DIR}.zip" ]; then
         log "Found ZIP file in playlist directory. Extracting contents..."
         TEMP_DIR=$(mktemp -d)
-        unzip -oq "$PLAYLIST_DIR/$PLAYLIST_DIR.zip" -d "$TEMP_DIR" || handle_error "Failed to extract ZIP file"
+        unzip -oq "${PLAYLIST_DIR}.zip" -d "$TEMP_DIR" || handle_error "Failed to extract ZIP file"
         log "Extraction complete. Temporary directory: $TEMP_DIR"
     else
         log "No ZIP file found. Continuing without extraction."
