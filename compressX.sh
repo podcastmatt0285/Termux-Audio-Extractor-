@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Base directory for music
-BASE_DIR="$HOME/storage/music/termux"
+# Base directories for searching
+BASE_DIRS=("$HOME/storage/music/termux" "$HOME/storage/movies/termux")
 
 # Function to log messages
 log() {
