@@ -61,7 +61,7 @@ select_directory() {
 # Decompress existing compressed files if necessary
 decompress_if_needed() {
     local compressed_file
-    compressed_file=$(find "$SELECTED_DIR" -maxdepth 1 -type f -name "*.zip" -o -name "*.tar.gz" -o -name "*.7z" | head -n 1)
+    compressed_file=$(find "$SELECTED_DIR" -maxdepth 1 -type f \( -name "*.zip" -o -name "*.tar.gz" -o -name "*.7z" \) | head -n 1)
     if [ -n "$compressed_file" ]; then
         log "Found existing compressed file: $compressed_file. Decompressing..."
         case "$compressed_file" in
@@ -109,7 +109,7 @@ compress_directory() {
     log "Compressing $SELECTED_DIR into $OUTPUT_FILE with $format format and $level compression level..."
 
     if [ "$format" = "tar.gz" ]; then
-        tar -czf "$OUTPUT_FILE" "${compression_args[@]}" "$SELECTED_DIR" || handle_error "Failed to compress directory"
+        tar -czf "$OUTPUT_FILE" "$SELECTED_DIR" || handle_error "Failed to compress directory"
     elif [ "$format" = "7z" ]; then
         "${compression_command[@]}" "$OUTPUT_FILE" "${compression_args[@]}" "$SELECTED_DIR" || handle_error "Failed to compress directory"
     else
