@@ -66,3 +66,4 @@ chmod +x syncX.sh
 # Ensure storage permissions are granted 
 cd ~/storage
 termux-setup-storage
+y
