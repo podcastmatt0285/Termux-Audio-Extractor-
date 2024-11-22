@@ -63,29 +63,54 @@ select_directory() {
     log "Selected directory: $SELECTED_DIR"
 }
 
-# Decompress files in the selected directory and subdirectories
-decompress_files() {
-    log "Searching for compressed files in $SELECTED_DIR and subdirectories..."
+# List compressed files and allow user to select for decompression
+select_compressed_file() {
+    log "Listing available compressed files in $SELECTED_DIR..."
+    local files=()
+    while IFS= read -r -d '' file; do
+        files+=("$file")
+    done < <(find "$SELECTED_DIR" -type f \( -name "*.zip" -o -name "*.tar.gz" -o -name "*.7z" \) -print0)
 
-    find "$SELECTED_DIR" -type f \( -name "*.zip" -o -name "*.tar.gz" -o -name "*.7z" \) | while read -r file; do
-        log "Found compressed file: $file. Decompressing..."
-        case "$file" in
-            *.zip)
-                unzip "$file" -d "$(dirname "$file")" || handle_error "Failed to decompress $file"
-                ;;
-            *.tar.gz)
-                tar -xzf "$file" -C "$(dirname "$file")" || handle_error "Failed to decompress $file"
-                ;;
-            *.7z)
-                7z x "$file" -o"$(dirname "$file")" || handle_error "Failed to decompress $file"
-                ;;
-            *)
-                handle_error "Unsupported compression format for $file"
-                ;;
-        esac
-        rm "$file" || handle_error "Failed to remove $file after decompression"
-        log "Decompression of $file completed."
+    if [ ${#files[@]} -eq 0 ]; then
+        log "No compressed files found in $SELECTED_DIR."
+        exit 0
+    fi
+
+    echo "Select a file to decompress:"
+    for i in "${!files[@]}"; do
+        echo "$((i + 1))) ${files[i]}"
     done
+
+    read -rp "Enter the number of your choice: " choice
+    if [[ ! "$choice" =~ ^[0-9]+$ ]] || ((choice < 1 || choice > ${#files[@]})); then
+        handle_error "Invalid selection. Please run the script again."
+    fi
+
+    SELECTED_FILE="${files[$((choice - 1))]}"
+    log "Selected file: $SELECTED_FILE"
+}
+
+# Decompress the selected file
+decompress_file() {
+    log "Decompressing $SELECTED_FILE..."
+
+    case "$SELECTED_FILE" in
+        *.zip)
+            unzip "$SELECTED_FILE" -d "$(dirname "$SELECTED_FILE")" || handle_error "Failed to decompress $SELECTED_FILE"
+            ;;
+        *.tar.gz)
+            tar -xzf "$SELECTED_FILE" -C "$(dirname "$SELECTED_FILE")" || handle_error "Failed to decompress $SELECTED_FILE"
+            ;;
+        *.7z)
+            7z x "$SELECTED_FILE" -o"$(dirname "$SELECTED_FILE")" || handle_error "Failed to decompress $SELECTED_FILE"
+            ;;
+        *)
+            handle_error "Unsupported compression format for $SELECTED_FILE"
+            ;;
+    esac
+
+    rm "$SELECTED_FILE" || handle_error "Failed to remove $SELECTED_FILE after decompression"
+    log "Decompression of $SELECTED_FILE completed."
 }
 
 # Main script execution
@@ -95,7 +120,8 @@ main() {
     log "Starting decompression script..."
     check_dependencies
     select_directory
-    decompress_files
+    select_compressed_file
+    decompress_file
 
     log "Script completed successfully."
 }
