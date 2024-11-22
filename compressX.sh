@@ -22,7 +22,7 @@ handle_error() {
 # Check dependencies
 check_dependencies() {
     log "Checking for required dependencies..."
-    for tool in zip tar 7z; do
+    for tool in unzip tar 7z; do
         if ! command -v "$tool" &>/dev/null; then
             log "$tool is not installed. Installing..."
             case "$tool" in
@@ -43,11 +43,13 @@ check_dependencies() {
 select_directory() {
     log "Listing available directories..."
     local dirs=()
-    while IFS= read -r -d '' dir; do
-        dirs+=("$dir")
-    done < <(find "$BASE_DIR" -type d -print0)
+    for base_dir in "${BASE_DIRS[@]}"; do
+        while IFS= read -r -d '' dir; do
+            dirs+=("$dir")
+        done < <(find "$base_dir" -type d -print0)
+    done
 
-    echo "Select a directory to compress:"
+    echo "Select a directory to decompress:"
     for i in "${!dirs[@]}"; do
         echo "$((i + 1))) ${dirs[i]}"
     done
@@ -61,76 +63,39 @@ select_directory() {
     log "Selected directory: $SELECTED_DIR"
 }
 
-# Decompress existing compressed files if necessary
-decompress_if_needed() {
-    local compressed_file
-    compressed_file=$(find "$SELECTED_DIR" -maxdepth 1 -type f \( -name "*.zip" -o -name "*.tar.gz" -o -name "*.7z" \) | head -n 1)
-    if [ -n "$compressed_file" ]; then
-        log "Found existing compressed file: $compressed_file. Decompressing..."
-        case "$compressed_file" in
-            *.zip) unzip "$compressed_file" -d "$SELECTED_DIR" || handle_error "Failed to decompress $compressed_file" ;;
-            *.tar.gz) tar -xzf "$compressed_file" -C "$SELECTED_DIR" || handle_error "Failed to decompress $compressed_file" ;;
-            *.7z) 7z x "$compressed_file" -o"$SELECTED_DIR" || handle_error "Failed to decompress $compressed_file" ;;
-            *) handle_error "Unsupported compression format for $compressed_file" ;;
+# Decompress files in the selected directory and subdirectories
+decompress_files() {
+    log "Searching for compressed files in $SELECTED_DIR and subdirectories..."
+
+    find "$SELECTED_DIR" -type f \( -name "*.zip" -o -name "*.tar.gz" -o -name "*.7z" \) | while read -r file; do
+        log "Found compressed file: $file. Decompressing..."
+        case "$file" in
+            *.zip)
+                unzip "$file" -d "$(dirname "$file")" || handle_error "Failed to decompress $file"
+                ;;
+            *.tar.gz)
+                tar -xzf "$file" -C "$(dirname "$file")" || handle_error "Failed to decompress $file"
+                ;;
+            *.7z)
+                7z x "$file" -o"$(dirname "$file")" || handle_error "Failed to decompress $file"
+                ;;
+            *)
+                handle_error "Unsupported compression format for $file"
+                ;;
         esac
-        rm "$compressed_file" || handle_error "Failed to remove $compressed_file after decompression"
-        log "Decompression completed."
-    else
-        log "No existing compressed file found in $SELECTED_DIR."
-    fi
-}
-
-# Perform compression
-compress_directory() {
-    read -rp "Choose compression format (zip/tar.gz/7z): " format
-    read -rp "Choose compression level (low/medium/high): " level
-
-    case "$format" in
-        zip) compression_command=("zip" "-r") ;;
-        tar.gz) compression_command=("tar" "-czf") ;;
-        7z) compression_command=("7z" "a") ;;
-        *) handle_error "Invalid format: $format" ;;
-    esac
-
-    case "$level" in
-        low)
-            compression_args=("-mx=1") # For 7z, low level compression
-            ;;
-        medium)
-            compression_args=("-mx=5") # For 7z, medium level compression
-            ;;
-        high)
-            compression_args=("-mx=9") # For 7z, high level compression
-            ;;
-        *)
-            handle_error "Invalid compression level: $level"
-            ;;
-    esac
-
-    OUTPUT_FILE="$SELECTED_DIR.$format"
-    LOGFILE="$BASE_DIR/compressX.log"
-    log "Compressing $SELECTED_DIR into $OUTPUT_FILE with $format format and $level compression level..."
-
-    if [ "$format" = "tar.gz" ]; then
-        tar -czf "$OUTPUT_FILE" "$SELECTED_DIR" || handle_error "Failed to compress directory"
-    elif [ "$format" = "7z" ]; then
-        "${compression_command[@]}" "$OUTPUT_FILE" "${compression_args[@]}" "$SELECTED_DIR" || handle_error "Failed to compress directory"
-    else
-        "${compression_command[@]}" "$OUTPUT_FILE" "${compression_args[@]}" "$SELECTED_DIR" || handle_error "Failed to compress directory"
-    fi
-
-    log "Compression completed successfully. File saved as $OUTPUT_FILE"
+        rm "$file" || handle_error "Failed to remove $file after decompression"
+        log "Decompression of $file completed."
+    done
 }
 
 # Main script execution
 main() {
-    LOGFILE="$BASE_DIR/compressX.log"
+    LOGFILE="$HOME/decompressX.log"
 
-    log "Starting compression script..."
+    log "Starting decompression script..."
     check_dependencies
     select_directory
-    decompress_if_needed
-    compress_directory
+    decompress_files
 
     log "Script completed successfully."
 }
