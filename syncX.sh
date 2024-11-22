@@ -83,7 +83,7 @@ download_new_tracks() {
         done < "$tracks_to_download"
     else
         log "No new tracks to download."
-    fi
+    }
 }
 
 # Function to remove outdated tracks
@@ -104,7 +104,7 @@ remove_outdated_tracks() {
         done < "$tracks_to_remove"
     else
         log "No outdated tracks to remove."
-    fi
+    }
 }
 
 # Function to list and select subdirectories
@@ -130,8 +130,18 @@ log "Starting playlistSyncX script"
 
 # User inputs
 select_subdirectory
-echo "Enter the YouTube playlist URL:"
-read -r YOUTUBE_PLAYLIST_URL
+
+# Check if the configuration file exists and load the URL if it does
+if [ -f "$PLAYLIST_DIR/playlist_config.conf" ]; then
+    # Load the URL from the configuration file
+    source "$PLAYLIST_DIR/playlist_config.conf"
+else
+    # Ask the user for the URL if the configuration file does not exist
+    echo "Enter the YouTube playlist URL:"
+    read -r YOUTUBE_PLAYLIST_URL
+    # Save the URL to a configuration file for future use
+    echo "YOUTUBE_PLAYLIST_URL=$YOUTUBE_PLAYLIST_URL" > "$PLAYLIST_DIR/playlist_config.conf"
+fi
 
 # Ensure directories and files exist
 mkdir -p "$PLAYLIST_DIR"
