@@ -3,6 +3,7 @@
 SHARED_DIR=~/storage/shared/termux
 HOST_FILE=~/termux_hosts.txt
 CURRENT_HOST=""
+PORT=12345
 
 # Function to initialize shared directory
 initialize_shared_dir() {
@@ -19,25 +20,29 @@ host_directory() {
     initialize_shared_dir
     HOST_IP=$(termux-wifi-connectioninfo | jq -r .ip)
     CURRENT_HOST="$HOST_IP"
-    echo "$HOST_IP:$SHARED_DIR" >> "$HOST_FILE"
+    echo "$HOST_IP:$SHARED_DIR" > "$HOST_FILE"
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
+    while true; do
+        echo "$HOST_IP" | nc -u -w1 255.255.255.255 "$PORT"
+        sleep 5
+    done &
 }
 
-# Function to list available hosts
-list_hosts() {
-    if [ -f "$HOST_FILE" ]; then
-        echo "Available hosts:"
-        while IFS= read -r line; do
-            echo "$line"
-        done < "$HOST_FILE"
-    else
-        echo "No hosts currently available."
-    fi
+# Function to discover available hosts
+discover_hosts() {
+    echo "Listening for hosts..."
+    nc -u -l -p "$PORT" > "$HOST_FILE" &
+    PID=$!
+    sleep 5
+    kill "$PID"
+    HOSTS=$(cat "$HOST_FILE")
+    echo "Available hosts:"
+    echo "$HOSTS"
 }
 
 # Function to join a host's shareable directory
 join_host() {
-    list_hosts
+    discover_hosts
     echo "Enter the IP of the host you want to join:"
     read -r HOST_IP
     CURRENT_HOST="$HOST_IP"
