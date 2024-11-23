@@ -34,6 +34,7 @@ host_directory() {
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
     while true; do
         echo "$HOST_IP" | nc -u -w1 255.255.255.255 "$PORT"
+        echo "Broadcasting IP: $HOST_IP"  # Debug line
         sleep 5
     done &
 }
