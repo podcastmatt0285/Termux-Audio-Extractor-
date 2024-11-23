@@ -27,14 +27,15 @@ initialize_shared_dir() {
 # Function to start SSH server
 start_ssh_server() {
     sshd
-    echo "SSH server started. Connect using 'ssh <username>@$(ip addr show wlan0 | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)'"
+    HOST_IP=$(ifconfig wlan0 | grep 'inet ' | awk '{print $2}')
+    echo "SSH server started. Connect using 'ssh <username>@$HOST_IP'"
 }
 
 # Function to host a shareable directory
 host_directory() {
     initialize_shared_dir
     start_ssh_server
-    HOST_IP=$(ip addr show wlan0 | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)
+    HOST_IP=$(ifconfig wlan0 | grep 'inet ' | awk '{print $2}')
     echo "$HOST_IP" >> "$HOST_FILE"
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
 }
