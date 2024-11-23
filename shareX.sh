@@ -2,6 +2,7 @@
 
 SHARED_DIR=~/storage/shared/termux
 PORT=8022
+USERNAME="u0_a"
 
 # Function to check and install dependencies
 check_and_install_dependencies() {
@@ -27,14 +28,25 @@ start_ssh_server() {
         echo "Failed to get IP address. Please ensure Wi-Fi is enabled."
         exit 1
     fi
-    echo "SSH server started. Connect using 'ssh <username>@$HOST_IP -p $PORT'"
+    echo "SSH server started. Connect using 'ssh $USERNAME@$HOST_IP -p $PORT'"
     echo "Host IP: $HOST_IP"
+}
+
+# Function to set up SSH key-based authentication
+setup_ssh_keys() {
+    ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+    if [ ! -d "$HOME/.ssh" ]; then
+        mkdir -p "$HOME/.ssh"
+    fi
+    cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
+    echo "SSH key-based authentication set up."
 }
 
 # Function to host a shareable directory
 host_directory() {
     initialize_shared_dir
     start_ssh_server
+    setup_ssh_keys
     HOST_IP=$(termux-wifi-connectioninfo | jq -r '.ip')
     if [ -z "$HOST_IP" ]; then
         echo "Failed to get IP address. Please ensure Wi-Fi is enabled."
@@ -68,6 +80,10 @@ join_host() {
         if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#HOSTS[@]} ]]; then
             HOST_IP="${HOSTS[$((SELECTION - 1))]}"
             echo "Joined host $HOST_IP. You can now access their shareable directory via SSH."
+            
+            # Ensure SSH key-based authentication
+            ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+            ssh-copy-id -p $PORT $USERNAME@$HOST_IP
         else
             echo "Invalid selection. Exiting."
             exit 1
@@ -112,7 +128,7 @@ upload_file() {
     read -r SELECTION
     if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#FILES[@]} ]]; then
         SELECTED_FILE="${FILES[$((SELECTION - 1))]}"
-        scp -P $PORT "$SELECTED_FILE" "your_username@$HOST_IP:$SHARED_DIR"
+        scp -P $PORT "$SELECTED_FILE" "$USERNAME@$HOST_IP:$SHARED_DIR"
         if [ $? -eq 0 ]; then
             echo "File uploaded to shared directory: $SHARED_DIR"
         else
@@ -126,9 +142,9 @@ upload_file() {
 
 # Function to list and download files
 download_file() {
-    ssh -p $PORT "your_username@$HOST_IP" "ls $SHARED_DIR"
+    ssh -p $PORT "$USERNAME@$HOST_IP" "ls $SHARED_DIR"
     echo "Files available for download:"
-    FILES=($(ssh -p $PORT "your_username@$HOST_IP" "ls $SHARED_DIR"))
+    FILES=($(ssh -p $PORT "$USERNAME@$HOST_IP" "ls $SHARED_DIR"))
     if [ ${#FILES[@]} -eq 0 ]; then
         echo "No files available for download."
         return
@@ -142,7 +158,7 @@ download_file() {
     read -r SELECTION
     if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#FILES[@]} ]]; then
         SELECTED_FILE="${FILES[$((SELECTION - 1))]}"
-        scp -P $PORT "your_username@$HOST_IP:$SHARED_DIR/$SELECTED_FILE" .
+        scp -P $PORT "$USERNAME@$HOST_IP:$SHARED_DIR/$SELECTED_FILE" .
         if [ $? -eq 0 ]; then
             echo "File downloaded to current directory: $(pwd)"
         else
