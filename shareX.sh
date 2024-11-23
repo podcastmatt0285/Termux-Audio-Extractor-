@@ -1,13 +1,12 @@
 #!/bin/bash
 
 SHARED_DIR=~/storage/shared/termux
-NETWORK_SHARED_FILE_PATH="/path/to/network_shared_directory/termux_hosts.txt"
 PORT=8022
 
 # Function to check and install dependencies
 check_and_install_dependencies() {
     pkg update
-    pkg install openssh termux-api jq -y
+    pkg install openssh termux-api jq nmap -y
 }
 
 # Function to initialize shared directory
@@ -41,16 +40,16 @@ host_directory() {
         echo "Failed to get IP address. Please ensure Wi-Fi is enabled."
         exit 1
     fi
-    echo "$HOST_IP" > "$NETWORK_SHARED_FILE_PATH"
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
-    echo "Written IP to shared file: $(cat $NETWORK_SHARED_FILE_PATH)"
 }
 
 # Function to discover available hosts
 discover_hosts() {
-    echo "Checking for available hosts..."
-    if [ -f "$NETWORK_SHARED_FILE_PATH" ]; then
-        HOSTS=($(grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' "$NETWORK_SHARED_FILE_PATH"))
+    echo "Checking for available hosts using nmap..."
+    NETWORK_SUBNET=$(termux-wifi-connectioninfo | jq -r '.ip' | cut -d'.' -f1-3).0/24
+    HOSTS=($(nmap -p 8022 --open -oG - $NETWORK_SUBNET | awk '/Ports: 8022\/open/ {print $2}'))
+
+    if [ ${#HOSTS[@]} -gt 0 ]; then
         echo "Available hosts:"
         for i in "${!HOSTS[@]}"; do
             echo "$((i + 1)). ${HOSTS[$i]}"
