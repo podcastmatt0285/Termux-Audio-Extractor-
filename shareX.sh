@@ -32,23 +32,29 @@ start_ssh_server() {
     echo "Host IP: $HOST_IP"
 }
 
-# Function to set up SSH key-based authentication
-setup_ssh_keys() {
+# Function to set up SSH key-based authentication on the host
+setup_host_ssh_keys() {
     if [ ! -f ~/.ssh/id_ed25519 ]; then
         ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
     fi
-    if [ ! -d "$HOME/.ssh" ]; then
-        mkdir -p "$HOME/.ssh"
-    fi
+    mkdir -p ~/.ssh
     cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
-    echo "SSH key-based authentication set up."
+    chmod 600 ~/.ssh/authorized_keys
+    echo "SSH key-based authentication set up on host."
+}
+
+# Function to setup SSH key-based authentication on the joiner
+setup_joiner_ssh_keys() {
+    if [ ! -f ~/.ssh/id_ed25519 ]; then
+        ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+    fi
 }
 
 # Function to host a shareable directory
 host_directory() {
     initialize_shared_dir
     start_ssh_server
-    setup_ssh_keys
+    setup_host_ssh_keys
     HOST_IP=$(termux-wifi-connectioninfo | jq -r '.ip')
     if [ -z "$HOST_IP" ]; then
         echo "Failed to get IP address. Please ensure Wi-Fi is enabled."
@@ -65,7 +71,7 @@ discover_hosts() {
 
     if [ ${#HOSTS[@]} -gt 0 ]; then
         echo "Available hosts:"
-        for i in "${!HOSTS[@]}"; do
+        for i in "${!HOSTS[@]}"]; do
             echo "$((i + 1)). ${HOSTS[$i]}"
         done
     else
@@ -82,11 +88,9 @@ join_host() {
         if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#HOSTS[@]} ]]; then
             HOST_IP="${HOSTS[$((SELECTION - 1))]}"
             echo "Joined host $HOST_IP. You can now access their shareable directory via SSH."
-            
+
             # Ensure SSH key-based authentication
-            if [ ! -f ~/.ssh/id_ed25519 ]; then
-                ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
-            fi
+            setup_joiner_ssh_keys
             ssh-copy-id -p $PORT $USERNAME@$HOST_IP
         else
             echo "Invalid selection. Exiting."
@@ -124,7 +128,7 @@ upload_file() {
         return
     fi
     echo "Found the following files:"
-    for i in "${!FILES[@]}"; do
+    for i in "${!FILES[@]}"]; do
         echo "$((i + 1)). ${FILES[$i]}"
     done
 
