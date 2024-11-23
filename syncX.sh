@@ -67,6 +67,10 @@ sync_playlists() {
         find "$TEMP_DIR" -maxdepth 1 -type f -name "*.mp3" -exec basename {} \; >> "$local_playlist"
     fi
 
+    # Sort playlists before comparison
+    sort "$online_playlist" -o "$online_playlist"
+    sort "$local_playlist" -o "$local_playlist"
+
     log "Comparing playlists and identifying differences"
     comm -23 "$online_playlist" "$local_playlist" > "$tracks_to_download"
     comm -13 "$online_playlist" "$local_playlist" > "$tracks_to_remove"
@@ -77,8 +81,8 @@ download_new_tracks() {
     if [ -s "$tracks_to_download" ]; then
         log "Downloading new tracks from YouTube"
         while IFS= read -r track; do
-            yt-dlp -x --audio-format mp3 -o "$PLAYLIST_DIR/%(title)s.%(ext)s" "$YOUTUBE_PLAYLIST_URL" \
-                --match-title "^$track$" || handle_error "Failed to download track: $track"
+            yt-dlp -x --audio-format mp3 -o "$PLAYLIST_DIR/%(title)s-%(id)s.%(ext)s" "$YOUTUBE_PLAYLIST_URL" \
+                --match-title "$track" || handle_error "Failed to download track: $track"
             log "Downloaded track: $track"
         done < "$tracks_to_download"
     else
