@@ -34,7 +34,9 @@ start_ssh_server() {
 
 # Function to set up SSH key-based authentication
 setup_ssh_keys() {
-    ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+    if [ ! -f ~/.ssh/id_ed25519 ]; then
+        ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+    fi
     if [ ! -d "$HOME/.ssh" ]; then
         mkdir -p "$HOME/.ssh"
     fi
@@ -82,7 +84,9 @@ join_host() {
             echo "Joined host $HOST_IP. You can now access their shareable directory via SSH."
             
             # Ensure SSH key-based authentication
-            ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+            if [ ! -f ~/.ssh/id_ed25519 ]; then
+                ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+            fi
             ssh-copy-id -p $PORT $USERNAME@$HOST_IP
         else
             echo "Invalid selection. Exiting."
@@ -99,7 +103,7 @@ search_files() {
     echo "Searching for compressed files in movies and music directories..."
     SEARCH_DIRS=("$HOME/storage/movies/termux" "$HOME/storage/music/termux")
     FILES=()
-    for dir in "${SEARCH_DIRS[@]}"; do
+    for dir in "${SEARCH_DIRS[@]}"]; do
         echo "Checking directory: $dir"
         if [ -d "$dir" ]; then
             while IFS= read -r -d '' file; do
@@ -149,7 +153,7 @@ download_file() {
         echo "No files available for download."
         return
     fi
-    for i in "${!FILES[@]}"; do
+    for i in "${!FILES[@]}"]; do
         FILE_NAME=$(basename "${FILES[$i]}")
         echo "$((i + 1)). $FILE_NAME"
     done
