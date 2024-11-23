@@ -43,7 +43,7 @@ setup_host_ssh_keys() {
     echo "SSH key-based authentication set up on host."
 }
 
-# Function to setup SSH key-based authentication on the joiner
+# Function to set up SSH key-based authentication on the joiner
 setup_joiner_ssh_keys() {
     if [ ! -f ~/.ssh/id_ed25519 ]; then
         ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
@@ -71,7 +71,7 @@ discover_hosts() {
 
     if [ ${#HOSTS[@]} -gt 0 ]; then
         echo "Available hosts:"
-        for i in "${!HOSTS[@]}"]; do
+        for i in "${!HOSTS[@]}"; do
             echo "$((i + 1)). ${HOSTS[$i]}"
         done
     else
@@ -107,7 +107,7 @@ search_files() {
     echo "Searching for compressed files in movies and music directories..."
     SEARCH_DIRS=("$HOME/storage/movies/termux" "$HOME/storage/music/termux")
     FILES=()
-    for dir in "${SEARCH_DIRS[@]}"]; do
+    for dir in "${SEARCH_DIRS[@]}"; do
         echo "Checking directory: $dir"
         if [ -d "$dir" ]; then
             while IFS= read -r -d '' file; do
@@ -128,7 +128,7 @@ upload_file() {
         return
     fi
     echo "Found the following files:"
-    for i in "${!FILES[@]}"]; do
+    for i in "${!FILES[@]}"; do
         echo "$((i + 1)). ${FILES[$i]}"
     done
 
@@ -157,7 +157,7 @@ download_file() {
         echo "No files available for download."
         return
     fi
-    for i in "${!FILES[@]}"]; do
+    for i in "${!FILES[@]}"; do
         FILE_NAME=$(basename "${FILES[$i]}")
         echo "$((i + 1)). $FILE_NAME"
     done
