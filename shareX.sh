@@ -27,7 +27,7 @@ initialize_shared_dir() {
 # Function to start SSH server
 start_ssh_server() {
     sshd
-    HOST_IP=$(ifconfig wlan0 | grep 'inet ' | awk '{print $2}')
+    HOST_IP=$(termux-wifi-connectioninfo | jq -r '.ip')
     echo "SSH server started. Connect using 'ssh <username>@$HOST_IP'"
 }
 
@@ -35,7 +35,7 @@ start_ssh_server() {
 host_directory() {
     initialize_shared_dir
     start_ssh_server
-    HOST_IP=$(ifconfig wlan0 | grep 'inet ' | awk '{print $2}')
+    HOST_IP=$(termux-wifi-connectioninfo | jq -r '.ip')
     echo "$HOST_IP" >> "$HOST_FILE"
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
 }
