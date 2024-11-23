@@ -227,6 +227,112 @@ Provides a tool for managing and extracting files from ZIP archives in predefine
 
 ---
 
+## CompressX.sh
+
+A versatile script for compressing directories in specified locations using various formats (ZIP, TAR.GZ, 7Z) and compression levels.
+
+### Features
+1. **Directory Selection**
+   - Automatically lists and allows selection of directories for compression within predefined base directories.
+   - Base directories include music and movies storage locations.
+
+2. **Compression Options**
+   - Supports multiple compression formats: ZIP, TAR.GZ, and 7Z.
+   - Offers three compression levels: low, medium, and high, to balance between speed and file size.
+
+3. **Dependency Management**
+   - Ensures required tools (zip, tar, 7z) are installed. Installs missing dependencies automatically.
+
+4. **Decompression Handling**
+   - Detects and decompresses existing compressed files within the selected directory before proceeding with new compression.
+
+5. **Logging**
+   - Maintains detailed logs of actions, errors, and progress in a designated log file (`compressX.log`).
+
+6. **Error Handling**
+   - Robust error handling and logging to ensure smooth operation.
+
+### Usage
+1. Run the script:
+   ```sh
+   ./CompressX.sh
+   ```
+2. Follow the prompts to:
+   - Select the directory to compress from the listed options.
+   - Choose the compression format (ZIP, TAR.GZ, 7Z).
+   - Select the desired compression level (low, medium, high).
+
+3. The script will:
+   - Ensure all necessary tools are installed.
+   - Decompress any existing compressed files in the selected directory.
+   - Compress the selected directory according to the chosen format and compression level.
+   - Log all actions in `compressX.log`.
+
+### Log File
+- **Location**: `$HOME/compressX.log`
+- **Contents**: Includes timestamps, messages about dependency checks, directory selections, compression actions, and error details.
+
+### Dependencies
+- zip
+- tar
+- 7z
+- termux-api (for Termux notifications)
+
+---
+
+## DcomX.sh
+
+A script for decompressing various formats (ZIP, TAR.GZ, 7Z) in specified directories, with robust logging and error handling.
+
+### Features
+1. **Directory Selection**
+   - Lists and allows selection of directories for decompression within predefined base directories.
+   - Base directories include music and movies storage locations.
+
+2. **Decompression Options**
+   - Supports multiple decompression formats: ZIP, TAR.GZ, and 7Z.
+   - Lists compressed files in the selected directory for user selection.
+
+3. **Dependency Management**
+   - Ensures required tools (unzip, tar, 7z) are installed. Installs missing dependencies automatically.
+
+4. **Logging**
+   - Maintains detailed logs of actions, errors, and progress in a designated log file (`decompressX.log`).
+
+5. **Error Handling**
+   - Robust error handling and logging to ensure smooth operation.
+
+### Usage
+1. Run the script:
+   ```sh
+   ./DcomX.sh
+   ```
+2. Follow the prompts to:
+   - Select the directory to decompress from the listed options.
+   - Choose the compressed file to decompress.
+
+3. The script will:
+   - Ensure all necessary tools are installed.
+   - List available compressed files for selection.
+   - Decompress the selected file into the directory.
+   - Log all actions in `decompressX.log`.
+
+### Log File
+- **Location**: `$HOME/decompressX.log`
+- **Contents**: Includes timestamps, messages about dependency checks, directory selections, decompression actions, and error details.
+
+### Dependencies
+- unzip
+- tar
+- 7z
+- termux-api (for Termux notifications)
+
+---
+
+These formatted sections should be ready to integrate into your GitHub repository. If you need further adjustments or additional formatting, feel free to ask!
+
+---
+
 ## Installation
 
 1. Clone the repository:
