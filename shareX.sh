@@ -1,29 +1,13 @@
 #!/bin/bash
 
 SHARED_DIR=~/storage/shared/termux
-HOST_FILE=~/storage/shared/termux_hosts.txt
+NETWORK_SHARED_FILE_PATH="/path/to/network_shared_directory/termux_hosts.txt"
 PORT=8022
 
 # Function to check and install dependencies
 check_and_install_dependencies() {
-    if ! command -v sshd &> /dev/null; then
-        echo "Installing openssh..."
-        pkg install openssh -y
-    else
-        echo "openssh is already installed."
-    fi
-    if ! command -v termux-wifi-connectioninfo &> /dev/null; then
-        echo "Installing termux-api..."
-        pkg install termux-api -y
-    else
-        echo "termux-api is already installed."
-    fi
-    if ! command -v jq &> /dev/null; then
-        echo "Installing jq..."
-        pkg install jq -y
-    else
-        echo "jq is already installed."
-    fi
+    pkg update
+    pkg install openssh termux-api jq -y
 }
 
 # Function to initialize shared directory
@@ -57,16 +41,16 @@ host_directory() {
         echo "Failed to get IP address. Please ensure Wi-Fi is enabled."
         exit 1
     fi
-    echo "$HOST_IP" > "$HOST_FILE"
+    echo "$HOST_IP" > "$NETWORK_SHARED_FILE_PATH"
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
-    echo "Written IP to host file: $(cat $HOST_FILE)"
+    echo "Written IP to shared file: $(cat $NETWORK_SHARED_FILE_PATH)"
 }
 
 # Function to discover available hosts
 discover_hosts() {
     echo "Checking for available hosts..."
-    if [ -f "$HOST_FILE" ]; then
-        HOSTS=($(grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' "$HOST_FILE"))
+    if [ -f "$NETWORK_SHARED_FILE_PATH" ]; then
+        HOSTS=($(grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' "$NETWORK_SHARED_FILE_PATH"))
         echo "Available hosts:"
         for i in "${!HOSTS[@]}"; do
             echo "$((i + 1)). ${HOSTS[$i]}"
