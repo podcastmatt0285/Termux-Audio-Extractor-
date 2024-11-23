@@ -54,7 +54,7 @@ host_directory() {
 discover_hosts() {
     echo "Checking for available hosts..."
     if [ -f "$HOST_FILE" ]; then
-        HOSTS=($(cat "$HOST_FILE"))
+        HOSTS=($(grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' "$HOST_FILE"))
         echo "Available hosts:"
         for i in "${!HOSTS[@]}"; do
             echo "$((i + 1)). ${HOSTS[$i]}"
