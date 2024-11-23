@@ -130,7 +130,7 @@ upload_file() {
         return
     fi
     echo "Found the following files:"
-    for i in "${!FILES[@]}"]; do
+    for i in "${!FILES[@]}"; do
         echo "$((i + 1)). ${FILES[$i]}"
     done
 
@@ -159,7 +159,7 @@ download_file() {
         echo "No files available for download."
         return
     fi
-    for i in "${!FILES[@]}"]; do
+    for i in "${!FILES[@]}"; do
         FILE_NAME=$(basename "${FILES[$i]}")
         echo "$((i + 1)). $FILE_NAME"
     done
