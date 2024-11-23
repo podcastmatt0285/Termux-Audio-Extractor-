@@ -28,6 +28,10 @@ initialize_shared_dir() {
 start_ssh_server() {
     sshd
     HOST_IP=$(termux-wifi-connectioninfo | jq -r '.ip')
+    if [ -z "$HOST_IP" ]; then
+        echo "Failed to get IP address. Please ensure Wi-Fi is enabled."
+        exit 1
+    fi
     echo "SSH server started. Connect using 'ssh <username>@$HOST_IP'"
 }
 
@@ -36,7 +40,11 @@ host_directory() {
     initialize_shared_dir
     start_ssh_server
     HOST_IP=$(termux-wifi-connectioninfo | jq -r '.ip')
-    echo "$HOST_IP" >> "$HOST_FILE"
+    if [ -z "$HOST_IP" ]; then
+        echo "Failed to get IP address. Please ensure Wi-Fi is enabled."
+        exit 1
+    fi
+    echo "$HOST_IP" > "$HOST_FILE"
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
 }
 
@@ -108,7 +116,11 @@ upload_file() {
     if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#FILES[@]} ]]; then
         SELECTED_FILE="${FILES[$((SELECTION - 1))]}"
         scp "$SELECTED_FILE" "your_username@$HOST_IP:$SHARED_DIR"
-        echo "File uploaded to shared directory: $SHARED_DIR"
+        if [ $? -eq 0 ]; then
+            echo "File uploaded to shared directory: $SHARED_DIR"
+        else
+            echo "Failed to upload file. Ensure SSH server is running and accessible."
+        fi
     else
         echo "Invalid selection. Exiting."
         exit 1
@@ -134,7 +146,11 @@ download_file() {
     if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#FILES[@]} ]]; then
         SELECTED_FILE="${FILES[$((SELECTION - 1))]}"
         scp "your_username@$HOST_IP:$SHARED_DIR/$SELECTED_FILE" .
-        echo "File downloaded to current directory: $(pwd)"
+        if [ $? -eq 0 ]; then
+            echo "File downloaded to current directory: $(pwd)"
+        else
+            echo "Failed to download file. Ensure SSH server is running and accessible."
+        fi
     else
         echo "Invalid selection. Exiting."
         exit 1
