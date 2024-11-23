@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SHARED_DIR=~/storage/shared/termux
-HOST_FILE=~/termux_hosts.txt
+SHARED_HOST_FILE=~/storage/shared/termux_hosts.txt
 CURRENT_HOST=""
 PORT=12345
 
@@ -30,25 +30,15 @@ host_directory() {
     initialize_shared_dir
     HOST_IP=$(termux-wifi-connectioninfo | jq -r .ip)
     CURRENT_HOST="$HOST_IP"
-    echo "$HOST_IP:$SHARED_DIR" > "$HOST_FILE"
+    echo "$HOST_IP:$SHARED_DIR" >> "$SHARED_HOST_FILE"
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
-    while true; do
-        echo "$HOST_IP" | nc -u -w1 255.255.255.255 "$PORT"
-        echo "Broadcasting IP: $HOST_IP"  # Debug line
-        sleep 5
-    done &
 }
 
 # Function to discover available hosts
 discover_hosts() {
-    echo "Listening for hosts..."
-    rm -f "$HOST_FILE"  # Clear previous hosts file
-    nc -u -l -p "$PORT" > "$HOST_FILE" &
-    PID=$!
-    sleep 5
-    kill "$PID"
-    if [ -s "$HOST_FILE" ]; then
-        HOSTS=($(cat "$HOST_FILE"))
+    echo "Checking for available hosts..."
+    if [ -f "$SHARED_HOST_FILE" ]; then
+        HOSTS=($(cat "$SHARED_HOST_FILE"))
         echo "Available hosts:"
         for i in "${!HOSTS[@]}"; do
             echo "$((i + 1)). ${HOSTS[$i]}"
