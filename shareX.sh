@@ -33,6 +33,7 @@ start_ssh_server() {
         exit 1
     fi
     echo "SSH server started. Connect using 'ssh <username>@$HOST_IP'"
+    echo "Host IP: $HOST_IP"  # Debug line
 }
 
 # Function to host a shareable directory
@@ -46,6 +47,7 @@ host_directory() {
     fi
     echo "$HOST_IP" > "$HOST_FILE"
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
+    echo "Written IP to host file: $(cat $HOST_FILE)"  # Debug line
 }
 
 # Function to discover available hosts
