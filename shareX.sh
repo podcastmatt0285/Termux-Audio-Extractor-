@@ -45,18 +45,26 @@ discover_hosts() {
     PID=$!
     sleep 5
     kill "$PID"
-    HOSTS=$(cat "$HOST_FILE")
+    HOSTS=($(cat "$HOST_FILE"))
     echo "Available hosts:"
-    echo "$HOSTS"
+    for i in "${!HOSTS[@]}"; do
+        echo "$((i + 1)). ${HOSTS[$i]}"
+    done
 }
 
 # Function to join a host's shareable directory
 join_host() {
     discover_hosts
-    echo "Enter the IP of the host you want to join:"
-    read -r HOST_IP
-    CURRENT_HOST="$HOST_IP"
-    echo "Joined host $HOST_IP. You can now access their shareable directory."
+    echo "Enter the number of the host you want to join:"
+    read -r SELECTION
+    if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#HOSTS[@]} ]]; then
+        HOST_IP="${HOSTS[$((SELECTION - 1))]}"
+        CURRENT_HOST="$HOST_IP"
+        echo "Joined host $HOST_IP. You can now access their shareable directory."
+    else
+        echo "Invalid selection. Exiting."
+        exit 1
+    fi
 }
 
 # Function to search for compressed files
@@ -65,17 +73,16 @@ search_files() {
     SEARCH_DIRS=("$HOME/storage/movies/termux" "$HOME/storage/music/termux")
     FILES=()
     for dir in "${SEARCH_DIRS[@]}"; do
-        echo "Checking directory: $dir"  # Debug line
+        echo "Checking directory: $dir"
         if [ -d "$dir" ]; then
             while IFS= read -r -d '' file; do
-                echo "Found file: $file"  # Debug line
                 FILES+=("$file")
             done < <(find "$dir" -type f \( -name "*.zip" -o -name "*.tar.gz" -o -name "*.7z" \) -print0)
         else
-            echo "Directory $dir does not exist."  # Debug line
+            echo "Directory $dir does not exist."
         fi
     done
-    echo "Files found: ${FILES[@]}"  # Debug line
+    echo "Files found: ${FILES[@]}"
 }
 
 # Function to upload a file
