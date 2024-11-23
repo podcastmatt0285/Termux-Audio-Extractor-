@@ -2,7 +2,7 @@
 
 SHARED_DIR=~/storage/shared/termux
 HOST_FILE=~/storage/shared/termux_hosts.txt
-PORT=12345
+PORT=8022
 
 # Function to check and install dependencies
 check_and_install_dependencies() {
@@ -44,7 +44,7 @@ start_ssh_server() {
         echo "Failed to get IP address. Please ensure Wi-Fi is enabled."
         exit 1
     fi
-    echo "SSH server started. Connect using 'ssh <username>@$HOST_IP'"
+    echo "SSH server started. Connect using 'ssh <username>@$HOST_IP -p $PORT'"
     echo "Host IP: $HOST_IP"
 }
 
@@ -129,7 +129,7 @@ upload_file() {
     read -r SELECTION
     if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#FILES[@]} ]]; then
         SELECTED_FILE="${FILES[$((SELECTION - 1))]}"
-        scp "$SELECTED_FILE" "your_username@$HOST_IP:$SHARED_DIR"
+        scp -P $PORT "$SELECTED_FILE" "your_username@$HOST_IP:$SHARED_DIR"
         if [ $? -eq 0 ]; then
             echo "File uploaded to shared directory: $SHARED_DIR"
         else
@@ -143,9 +143,9 @@ upload_file() {
 
 # Function to list and download files
 download_file() {
-    ssh "your_username@$HOST_IP" "ls $SHARED_DIR"
+    ssh -p $PORT "your_username@$HOST_IP" "ls $SHARED_DIR"
     echo "Files available for download:"
-    FILES=($(ssh "your_username@$HOST_IP" "ls $SHARED_DIR"))
+    FILES=($(ssh -p $PORT "your_username@$HOST_IP" "ls $SHARED_DIR"))
     if [ ${#FILES[@]} -eq 0 ]; then
         echo "No files available for download."
         return
@@ -159,7 +159,7 @@ download_file() {
     read -r SELECTION
     if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#FILES[@]} ]]; then
         SELECTED_FILE="${FILES[$((SELECTION - 1))]}"
-        scp "your_username@$HOST_IP:$SHARED_DIR/$SELECTED_FILE" .
+        scp -P $PORT "your_username@$HOST_IP:$SHARED_DIR/$SELECTED_FILE" .
         if [ $? -eq 0 ]; then
             echo "File downloaded to current directory: $(pwd)"
         else
