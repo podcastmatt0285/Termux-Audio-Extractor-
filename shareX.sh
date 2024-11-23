@@ -1,17 +1,22 @@
 #!/bin/bash
 
 SHARED_DIR=~/storage/shared/termux
-HOST_FILE=~/termux_hosts.txt
-CURRENT_HOST=""
+HOST_FILE=~/storage/shared/termux_hosts.txt
 PORT=12345
 
-# Function to check and install netcat-openbsd if not installed
-check_and_install_netcat() {
+# Function to check and install dependencies
+check_and_install_dependencies() {
     if ! command -v nc &> /dev/null; then
-        echo "netcat-openbsd is not installed. Installing..."
+        echo "Installing netcat-openbsd..."
         pkg install netcat-openbsd -y
     else
         echo "netcat-openbsd is already installed."
+    fi
+    if ! command -v sshd &> /dev/null; then
+        echo "Installing openssh..."
+        pkg install openssh -y
+    else
+        echo "openssh is already installed."
     fi
 }
 
@@ -25,29 +30,25 @@ initialize_shared_dir() {
     fi
 }
 
+# Function to start SSH server
+start_ssh_server() {
+    sshd
+    echo "SSH server started. Connect using 'ssh <username>@$(hostname -I | awk '{print $1}')'"
+}
+
 # Function to host a shareable directory
 host_directory() {
     initialize_shared_dir
+    start_ssh_server
     HOST_IP=$(termux-wifi-connectioninfo | jq -r .ip)
-    CURRENT_HOST="$HOST_IP"
-    echo "$HOST_IP:$SHARED_DIR" > "$HOST_FILE"
+    echo "$HOST_IP" >> "$HOST_FILE"
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
-    while true; do
-        echo "$HOST_IP" | nc -u -w1 255.255.255.255 "$PORT"
-        echo "Broadcasting IP: $HOST_IP"  # Debug line
-        sleep 5
-    done &
 }
 
 # Function to discover available hosts
 discover_hosts() {
-    echo "Listening for hosts..."
-    rm -f "$HOST_FILE"  # Clear previous hosts file
-    nc -u -l -p "$PORT" > "$HOST_FILE" &
-    PID=$!
-    sleep 5
-    kill "$PID"
-    if [ -s "$HOST_FILE" ]; then
+    echo "Checking for available hosts..."
+    if [ -f "$HOST_FILE" ]; then
         HOSTS=($(cat "$HOST_FILE"))
         echo "Available hosts:"
         for i in "${!HOSTS[@]}"; do
@@ -66,8 +67,7 @@ join_host() {
         read -r SELECTION
         if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#HOSTS[@]} ]]; then
             HOST_IP="${HOSTS[$((SELECTION - 1))]}"
-            CURRENT_HOST="$HOST_IP"
-            echo "Joined host $HOST_IP. You can now access their shareable directory."
+            echo "Joined host $HOST_IP. You can now access their shareable directory via SSH."
         else
             echo "Invalid selection. Exiting."
             exit 1
@@ -112,7 +112,7 @@ upload_file() {
     read -r SELECTION
     if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#FILES[@]} ]]; then
         SELECTED_FILE="${FILES[$((SELECTION - 1))]}"
-        cp "$SELECTED_FILE" "$SHARED_DIR"
+        scp "$SELECTED_FILE" "your_username@$HOST_IP:$SHARED_DIR"
         echo "File uploaded to shared directory: $SHARED_DIR"
     else
         echo "Invalid selection. Exiting."
@@ -122,8 +122,9 @@ upload_file() {
 
 # Function to list and download files
 download_file() {
+    ssh "your_username@$HOST_IP" "ls $SHARED_DIR"
     echo "Files available for download:"
-    FILES=("$SHARED_DIR"/*)
+    FILES=($(ssh "your_username@$HOST_IP" "ls $SHARED_DIR"))
     if [ ${#FILES[@]} -eq 0 ]; then
         echo "No files available for download."
         return
@@ -137,7 +138,7 @@ download_file() {
     read -r SELECTION
     if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#FILES[@]} ]]; then
         SELECTED_FILE="${FILES[$((SELECTION - 1))]}"
-        cp "$SELECTED_FILE" .
+        scp "your_username@$HOST_IP:$SHARED_DIR/$SELECTED_FILE" .
         echo "File downloaded to current directory: $(pwd)"
     else
         echo "Invalid selection. Exiting."
@@ -146,7 +147,7 @@ download_file() {
 }
 
 # Main Execution Loop
-check_and_install_netcat
+check_and_install_dependencies
 while true; do
     echo "Would you like to host or join a host? (host/join)"
     read -r HOST_ACTION
