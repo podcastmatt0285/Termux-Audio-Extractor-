@@ -12,6 +12,18 @@ check_and_install_dependencies() {
     else
         echo "openssh is already installed."
     fi
+    if ! command -v termux-wifi-connectioninfo &> /dev/null; then
+        echo "Installing termux-api..."
+        pkg install termux-api -y
+    else
+        echo "termux-api is already installed."
+    fi
+    if ! command -v jq &> /dev/null; then
+        echo "Installing jq..."
+        pkg install jq -y
+    else
+        echo "jq is already installed."
+    fi
 }
 
 # Function to initialize shared directory
@@ -33,7 +45,7 @@ start_ssh_server() {
         exit 1
     fi
     echo "SSH server started. Connect using 'ssh <username>@$HOST_IP'"
-    echo "Host IP: $HOST_IP"  # Debug line
+    echo "Host IP: $HOST_IP"
 }
 
 # Function to host a shareable directory
@@ -47,7 +59,7 @@ host_directory() {
     fi
     echo "$HOST_IP" > "$HOST_FILE"
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
-    echo "Written IP to host file: $(cat $HOST_FILE)"  # Debug line
+    echo "Written IP to host file: $(cat $HOST_FILE)"
 }
 
 # Function to discover available hosts
