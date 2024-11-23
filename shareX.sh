@@ -41,28 +41,38 @@ host_directory() {
 # Function to discover available hosts
 discover_hosts() {
     echo "Listening for hosts..."
+    rm -f "$HOST_FILE"  # Clear previous hosts file
     nc -u -l -p "$PORT" > "$HOST_FILE" &
     PID=$!
     sleep 5
     kill "$PID"
-    HOSTS=($(cat "$HOST_FILE"))
-    echo "Available hosts:"
-    for i in "${!HOSTS[@]}"; do
-        echo "$((i + 1)). ${HOSTS[$i]}"
-    done
+    if [ -s "$HOST_FILE" ]; then
+        HOSTS=($(cat "$HOST_FILE"))
+        echo "Available hosts:"
+        for i in "${!HOSTS[@]}"; do
+            echo "$((i + 1)). ${HOSTS[$i]}"
+        done
+    else
+        echo "No available hosts found."
+    fi
 }
 
 # Function to join a host's shareable directory
 join_host() {
     discover_hosts
-    echo "Enter the number of the host you want to join:"
-    read -r SELECTION
-    if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#HOSTS[@]} ]]; then
-        HOST_IP="${HOSTS[$((SELECTION - 1))]}"
-        CURRENT_HOST="$HOST_IP"
-        echo "Joined host $HOST_IP. You can now access their shareable directory."
+    if [ ${#HOSTS[@]} -gt 0 ]; then
+        echo "Enter the number of the host you want to join:"
+        read -r SELECTION
+        if [[ "$SELECTION" -ge 1 && "$SELECTION" -le ${#HOSTS[@]} ]]; then
+            HOST_IP="${HOSTS[$((SELECTION - 1))]}"
+            CURRENT_HOST="$HOST_IP"
+            echo "Joined host $HOST_IP. You can now access their shareable directory."
+        else
+            echo "Invalid selection. Exiting."
+            exit 1
+        fi
     else
-        echo "Invalid selection. Exiting."
+        echo "No available hosts to join. Exiting."
         exit 1
     fi
 }
