@@ -6,12 +6,6 @@ PORT=12345
 
 # Function to check and install dependencies
 check_and_install_dependencies() {
-    if ! command -v nc &> /dev/null; then
-        echo "Installing netcat-openbsd..."
-        pkg install netcat-openbsd -y
-    else
-        echo "netcat-openbsd is already installed."
-    fi
     if ! command -v sshd &> /dev/null; then
         echo "Installing openssh..."
         pkg install openssh -y
@@ -33,14 +27,14 @@ initialize_shared_dir() {
 # Function to start SSH server
 start_ssh_server() {
     sshd
-    echo "SSH server started. Connect using 'ssh <username>@$(hostname -I | awk '{print $1}')'"
+    echo "SSH server started. Connect using 'ssh <username>@$(ip addr show wlan0 | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)'"
 }
 
 # Function to host a shareable directory
 host_directory() {
     initialize_shared_dir
     start_ssh_server
-    HOST_IP=$(termux-wifi-connectioninfo | jq -r .ip)
+    HOST_IP=$(ip addr show wlan0 | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)
     echo "$HOST_IP" >> "$HOST_FILE"
     echo "Hosting shareable directory. Other users can join using IP: $HOST_IP"
 }
