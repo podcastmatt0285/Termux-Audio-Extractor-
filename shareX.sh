@@ -5,6 +5,16 @@ HOST_FILE=~/termux_hosts.txt
 CURRENT_HOST=""
 PORT=12345
 
+# Function to check and install netcat-openbsd if not installed
+check_and_install_netcat() {
+    if ! command -v nc &> /dev/null; then
+        echo "netcat-openbsd is not installed. Installing..."
+        pkg install netcat-openbsd -y
+    else
+        echo "netcat-openbsd is already installed."
+    fi
+}
+
 # Function to initialize shared directory
 initialize_shared_dir() {
     if [ ! -d "$SHARED_DIR" ]; then
@@ -101,7 +111,8 @@ download_file() {
         return
     fi
     for i in "${!FILES[@]}"; do
-        echo "$((i + 1)). ${FILES[$i]}"
+        FILE_NAME=$(basename "${FILES[$i]}")
+        echo "$((i + 1)). $FILE_NAME"
     done
 
     echo "Enter the number of the file you want to download:"
@@ -117,6 +128,7 @@ download_file() {
 }
 
 # Main Execution Loop
+check_and_install_netcat
 while true; do
     echo "Would you like to host or join a host? (host/join)"
     read -r HOST_ACTION
