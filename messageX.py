@@ -1,5 +1,7 @@
 import socket
 import threading
+import os
+from datetime import datetime
 
 # Constants
 BUFFER_SIZE = 1024
@@ -20,6 +22,7 @@ def broadcast_to_group(group_name, message, sender=None):
 def handle_client(client_socket):
     nickname = client_socket.recv(BUFFER_SIZE).decode('utf-8')
     clients[client_socket] = nickname
+    current_group = None
 
     while True:
         try:
@@ -30,19 +33,49 @@ def handle_client(client_socket):
                     if group_name not in groups:
                         groups[group_name] = []
                     groups[group_name].append(client_socket)
+                    current_group = group_name
                     broadcast_to_group(group_name, f"{nickname} has joined the group.")
                 elif data.startswith("/leave"):
-                    group_name = data.split(" ", 1)[1]
-                    if group_name in groups and client_socket in groups[group_name]:
-                        groups[group_name].remove(client_socket)
-                        broadcast_to_group(group_name, f"{nickname} has left the group.")
+                    if current_group and client_socket in groups.get(current_group, []):
+                        groups[current_group].remove(client_socket)
+                        broadcast_to_group(current_group, f"{nickname} has left the group.")
+                        current_group = None
+                    else:
+                        client_socket.send(b"You are not in any group.")
+                elif data.startswith("/sendfile"):
+                    if not current_group:
+                        client_socket.send(b"Join a group before sending a file.")
+                        continue
+                    client_socket.send(b"Send the file now.")
+                    file_name = f"received_{current_group}_{nickname}_{datetime.now().strftime('%Y%m%d%H%M%S')}.bin"
+                    with open(file_name, 'wb') as file:
+                        while True:
+                            chunk = client_socket.recv(BUFFER_SIZE)
+                            if not chunk:
+                                break
+                            file.write(chunk)
+                    broadcast_to_group(current_group, f"File received: {file_name}")
+                elif data == "/help":
+                    help_message = (
+                        "/join <group_name> - Join a group\n"
+                        "/leave - Leave the current group\n"
+                        "/sendfile - Send a file to the current group\n"
+                        "/help - Show this help menu\n"
+                    )
+                    client_socket.send(help_message.encode('utf-8'))
                 else:
-                    group_name, message = data.split(" ", 1)
-                    broadcast_to_group(group_name, f"{nickname}: {message}")
-        except:
-            client_socket.close()
-            clients.pop(client_socket, None)
+                    if current_group:
+                        broadcast_to_group(current_group, f"{nickname}: {data}")
+                    else:
+                        client_socket.send(b"Join a group before sending a message.")
+        except Exception as e:
+            print(f"Error: {e}")
             break
+
+    print(f"Client disconnected: {clients[client_socket]}")
+    if current_group and client_socket in groups.get(current_group, []):
+        groups[current_group].remove(client_socket)
+    client_socket.close()
 
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -52,8 +85,9 @@ def start_server():
 
     while True:
         client_socket, _ = server_socket.accept()
-        threading.Thread(target=handle_client, args=(client_socket,)).start()
+        threading.Thread(target=handle_client, args=(client_socket,), daemon=True).start()
 
+# Client Functions
 def receive_messages(client_socket):
     while True:
         try:
