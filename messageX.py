@@ -162,6 +162,7 @@ def join_server(host, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
     nickname = input("Enter your nickname: ").strip()
+    clients[client_socket]["nickname"] = nickname
     threading.Thread(target=receive_messages, args=(client_socket, nickname), daemon=True).start()
     client_menu(client_socket, nickname)
 
