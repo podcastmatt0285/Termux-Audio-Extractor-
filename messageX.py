@@ -1,6 +1,7 @@
 import socket
 import threading
 import os
+import sqlite3
 from datetime import datetime
 
 # Constants
@@ -10,9 +11,42 @@ PORT = 12345
 clients = {}
 groups = {}
 
+# Database setup
+conn = sqlite3.connect('messenger.db', check_same_thread=False)
+c = conn.cursor()
+
+# Create tables
+c.execute('''
+CREATE TABLE IF NOT EXISTS messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    group_name TEXT,
+    sender TEXT,
+    message TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+)
+''')
+
+c.execute('''
+CREATE TABLE IF NOT EXISTS files (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    group_name TEXT,
+    sender TEXT,
+    file_name TEXT,
+    file_path TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+)
+''')
+
+conn.commit()
+
 # Server-Side Functions
 def broadcast_to_group(group_name, message, sender=None):
     if group_name in groups:
+        # Store message in database
+        c.execute('INSERT INTO messages (group_name, sender, message) VALUES (?, ?, ?)', 
+                  (group_name, clients[sender]['nickname'], message.decode('utf-8')))
+        conn.commit()
+        
         for client_socket in groups[group_name]:
             if client_socket != sender:
                 try:
@@ -159,12 +193,15 @@ def receive_messages(client_socket, nickname):
             break
 
 def join_server(host, port):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((host, port))
-    nickname = input("Enter your nickname: ").strip()
-    clients[client_socket]["nickname"] = nickname
-    threading.Thread(target=receive_messages, args=(client_socket, nickname), daemon=True).start()
-    client_menu(client_socket, nickname)
+    try:
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((host, port))
+        nickname = input("Enter your nickname: ").strip()
+        clients[client_socket] = {"nickname": nickname}
+        threading.Thread(target=receive_messages, args=(client_socket, nickname), daemon=True).start()
+        client_menu(client_socket, nickname)
+    except Exception as e:
+        print(f"Failed to connect to the server: {e}")
 
 # Main Function
 if __name__ == "__main__":
