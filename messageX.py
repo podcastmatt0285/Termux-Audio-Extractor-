@@ -52,7 +52,7 @@ def broadcast_to_group(group_name, message, sender=None):
                 try:
                     client_socket.send(message)
                 except:
-                    pass
+                    print("Error sending message to a client.")
 
 def handle_client(client_socket, address):
     print(f"Client connected: {address}")
