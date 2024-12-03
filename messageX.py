@@ -4,26 +4,25 @@ import os
 from datetime import datetime
 
 # Constants
-BUFFER_SIZE = 4096
-DEFAULT_PORT = 12345
-
-# Groups and Clients
-groups = {}
+BUFFER_SIZE = 1024
+HOST = '0.0.0.0'
+PORT = 12345
 clients = {}
+groups = {}
 
-# Server Functions
+# Server-Side Functions
 def broadcast_to_group(group_name, message, sender=None):
-    for client in groups.get(group_name, []):
-        if client != sender:
-            try:
-                client.send(message)
-            except:
-                print(f"Client {clients.get(client)} disconnected.")
-                groups[group_name].remove(client)
+    if group_name in groups:
+        for client_socket in groups[group_name]:
+            if client_socket != sender:
+                try:
+                    client_socket.send(message)
+                except:
+                    pass
 
 def handle_client(client_socket, address):
     print(f"Client connected: {address}")
-    clients[client_socket] = f"{address[0]}:{address[1]}"
+    clients[client_socket] = {"nickname": None, "address": f"{address[0]}:{address[1]}"}
     client_socket.send(b"Welcome! Type /help for commands.")
     
     current_group = None
@@ -58,7 +57,7 @@ def handle_client(client_socket, address):
                     client_socket.send(b"Usage: /sendfile <group_name>")
                     continue
                 client_socket.send(b"Send the file now.")
-                file_name = f"received_{group_name}_{clients[client_socket]}_{datetime.now().strftime('%Y%m%d%H%M%S')}.bin"
+                file_name = f"received_{group_name}_{clients[client_socket]['nickname']}_{datetime.now().strftime('%Y%m%d%H%M%S')}.bin"
                 with open(file_name, 'wb') as file:
                     while True:
                         chunk = client_socket.recv(BUFFER_SIZE)
@@ -76,7 +75,9 @@ def handle_client(client_socket, address):
                 client_socket.send(help_message.encode('utf-8'))
             else:
                 if current_group:
-                    broadcast_to_group(current_group, f"{clients[client_socket]}: {command}".encode('utf-8'), sender=client_socket)
+                    nickname = clients[client_socket].get("nickname", "Anonymous")
+                    message = f"{nickname} says - {command}"
+                    broadcast_to_group(current_group, message.encode('utf-8'), sender=client_socket)
                 else:
                     client_socket.send(b"You are not in any group. Use /join to join a group.")
         except Exception as e:
@@ -88,31 +89,19 @@ def handle_client(client_socket, address):
         groups[current_group].remove(client_socket)
     client_socket.close()
 
-def start_server(port):
+# Server Setup
+def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('', port))
+    server_socket.bind((HOST, PORT))
     server_socket.listen(5)
-    print(f"Server started on port {port}. Waiting for connections...")
+    print(f"Server started on {HOST}:{PORT}")
 
     while True:
         client_socket, address = server_socket.accept()
-        threading.Thread(target=handle_client, args=(client_socket, address)).start()
+        threading.Thread(target=handle_client, args=(client_socket, address), daemon=True).start()
 
-# Client Functions
-def send_file(client_socket, group_name):
-    file_path = input("Enter the path of the file to send: ").strip()
-    if not os.path.exists(file_path):
-        print("File not found.")
-        return
-    client_socket.send(f"/sendfile {group_name}".encode('utf-8'))
-    response = client_socket.recv(BUFFER_SIZE)
-    if b"Send the file now" in response:
-        with open(file_path, 'rb') as file:
-            while chunk := file.read(BUFFER_SIZE):
-                client_socket.send(chunk)
-        print("File sent successfully.")
-
-def client_menu(client_socket):
+# Client-Side Functions
+def client_menu(client_socket, nickname):
     while True:
         print("\nChoose an action:")
         print("1. Join a group")
@@ -129,8 +118,9 @@ def client_menu(client_socket):
         elif choice == "2":
             client_socket.send(b"/leave")
         elif choice == "3":
-            message = input("Enter your message: ").strip()
-            client_socket.send(message.encode('utf-8'))
+            message = input(f"Enter your message ({nickname}): ").strip()
+            if message:
+                client_socket.send(f"{nickname} says - {message}".encode('utf-8'))
         elif choice == "4":
             group_name = input("Enter group name for file: ").strip()
             send_file(client_socket, group_name)
@@ -142,40 +132,48 @@ def client_menu(client_socket):
         else:
             print("Invalid choice. Try again.")
 
-def join_server(host, port):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((host, port))
-    threading.Thread(target=receive_messages, args=(client_socket,), daemon=True).start()
-    client_menu(client_socket)
+def send_file(client_socket, group_name):
+    try:
+        file_path = input("Enter the file path to send: ").strip()
+        if not os.path.exists(file_path):
+            print("File not found!")
+            return
 
-def receive_messages(client_socket):
+        with open(file_path, 'rb') as file:
+            data = file.read()
+            client_socket.send(f"/sendfile {group_name}".encode('utf-8'))
+            client_socket.send(data)
+            print(f"Sent file {file_path} to group {group_name}")
+    except Exception as e:
+        print(f"Error sending file: {e}")
+
+def receive_messages(client_socket, nickname):
     while True:
         try:
             data = client_socket.recv(BUFFER_SIZE)
             if not data:
                 break
-            print(data.decode('utf-8'))
-        except:
+            print(f"\n{data.decode('utf-8')}")
+        except Exception as e:
+            print(f"Error receiving messages: {e}")
             break
 
-# Main Function
-def main():
-    print("Welcome to Termux Messenger!")
-    print("1. Host a server")
-    print("2. Join a server")
-    choice = input("Enter your choice: ").strip()
+def join_server(host, port):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((host, port))
+    nickname = input("Enter your nickname: ").strip()
+    threading.Thread(target=receive_messages, args=(client_socket, nickname), daemon=True).start()
+    client_menu(client_socket, nickname)
 
-    if choice == "1":
-        port = input(f"Enter port (default {DEFAULT_PORT}): ").strip()
-        port = int(port) if port else DEFAULT_PORT
-        start_server(port)
-    elif choice == "2":
-        host = input("Enter server IP: ").strip()
-        port = input(f"Enter server port (default {DEFAULT_PORT}): ").strip()
-        port = int(port) if port else DEFAULT_PORT
+# Main Function
+if __name__ == "__main__":
+    choice = input("Would you like to (h)ost or (j)oin? ").strip().lower()
+
+    if choice == "h":
+        start_server()
+    elif choice == "j":
+        host = input("Enter the server IP address: ").strip()
+        port = int(input("Enter the server port: ").strip())
         join_server(host, port)
     else:
-        print("Invalid choice. Exiting.")
-
-if __name__ == "__main__":
-    main()
+        print("Invalid option.")
