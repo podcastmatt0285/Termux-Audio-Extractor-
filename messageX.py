@@ -1,122 +1,91 @@
 import socket
 import threading
-import os
-from datetime import datetime
-
-# Constants
-BUFFER_SIZE = 1024
-PORT = 12345
-clients = {}
-groups = {}
-
-# Server Functions
-def broadcast_to_group(group_name, message, sender=None):
-    for client_socket in groups.get(group_name, []):
-        if client_socket != sender:
-            try:
-                client_socket.send(message.encode('utf-8'))
-            except:
-                clients.pop(client_socket, None)
-                groups[group_name].remove(client_socket)
+import sys
 
 def handle_client(client_socket):
-    nickname = client_socket.recv(BUFFER_SIZE).decode('utf-8')
-    clients[client_socket] = nickname
-    current_group = None
-
-    while True:
-        try:
-            data = client_socket.recv(BUFFER_SIZE).decode('utf-8')
-            if data:
-                if data.startswith("/join"):
-                    group_name = data.split(" ", 1)[1]
-                    if group_name not in groups:
-                        groups[group_name] = []
-                    groups[group_name].append(client_socket)
-                    current_group = group_name
-                    broadcast_to_group(group_name, f"{nickname} has joined the group.")
-                elif data.startswith("/leave"):
-                    if current_group and client_socket in groups.get(current_group, []):
-                        groups[current_group].remove(client_socket)
-                        broadcast_to_group(current_group, f"{nickname} has left the group.")
-                        current_group = None
-                    else:
-                        client_socket.send(b"You are not in any group.")
-                elif data.startswith("/sendfile"):
-                    if not current_group:
-                        client_socket.send(b"Join a group before sending a file.")
-                        continue
-                    client_socket.send(b"Send the file now.")
-                    file_name = f"received_{current_group}_{nickname}_{datetime.now().strftime('%Y%m%d%H%M%S')}.bin"
-                    with open(file_name, 'wb') as file:
-                        while True:
-                            chunk = client_socket.recv(BUFFER_SIZE)
-                            if not chunk:
-                                break
-                            file.write(chunk)
-                    broadcast_to_group(current_group, f"File received: {file_name}")
-                elif data == "/help":
-                    help_message = (
-                        "/join <group_name> - Join a group\n"
-                        "/leave - Leave the current group\n"
-                        "/sendfile - Send a file to the current group\n"
-                        "/help - Show this help menu\n"
-                    )
-                    client_socket.send(help_message.encode('utf-8'))
-                else:
-                    if current_group:
-                        broadcast_to_group(current_group, f"{nickname}: {data}")
-                    else:
-                        client_socket.send(b"Join a group before sending a message.")
-        except Exception as e:
-            print(f"Error: {e}")
-            break
-
-    print(f"Client disconnected: {clients[client_socket]}")
-    if current_group and client_socket in groups.get(current_group, []):
-        groups[current_group].remove(client_socket)
-    client_socket.close()
+    """Handles communication with a connected client."""
+    try:
+        while True:
+            message = client_socket.recv(1024).decode('utf-8')
+            if not message:
+                break
+            print(f"Client: {message}")
+            reply = input("Reply: ")
+            client_socket.send(reply.encode('utf-8'))
+    except ConnectionResetError:
+        print("Client disconnected.")
+    finally:
+        client_socket.close()
 
 def start_server():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('0.0.0.0', PORT))
-    server_socket.listen(5)
-    print(f"Server started on port {PORT}")
+    """Starts the server to listen for incoming connections."""
+    try:
+        port = int(input("Enter port to run the server on (default: 5555): ") or 5555)
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.bind(('0.0.0.0', port))
+        server.listen(5)
+        print(f"Server started on port {port}, waiting for connections...")
+        
+        def shutdown_server():
+            """Gracefully shuts down the server."""
+            print("\nShutting down the server...")
+            server.close()
+            sys.exit(0)
 
-    while True:
-        client_socket, _ = server_socket.accept()
-        threading.Thread(target=handle_client, args=(client_socket,), daemon=True).start()
+        threading.Thread(target=lambda: input("\nPress Enter to stop the server.\n") or shutdown_server(), daemon=True).start()
 
-# Client Functions
-def receive_messages(client_socket):
-    while True:
-        try:
-            data = client_socket.recv(BUFFER_SIZE).decode('utf-8')
-            if data:
-                print(data)
-        except:
-            break
+        while True:
+            try:
+                client_socket, addr = server.accept()
+                print(f"Connection from {addr}")
+                threading.Thread(target=handle_client, args=(client_socket,)).start()
+            except OSError:
+                break
+    except Exception as e:
+        print(f"Server error: {e}")
 
-def start_client(server_ip, nickname):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((server_ip, PORT))
-    client_socket.send(nickname.encode('utf-8'))
+def start_client():
+    """Connects to the server as a client."""
+    try:
+        server_ip = input("Enter server IP (default: 127.0.0.1): ") or "127.0.0.1"
+        port = int(input("Enter server port (default: 5555): ") or 5555)
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect((server_ip, port))
+        print("Connected to the server.")
+        
+        def receive_messages():
+            """Receives messages from the server."""
+            try:
+                while True:
+                    message = client.recv(1024).decode('utf-8')
+                    if not message:
+                        break
+                    print(f"Server: {message}")
+            except ConnectionResetError:
+                print("Server disconnected.")
+            finally:
+                client.close()
 
-    threading.Thread(target=receive_messages, args=(client_socket,), daemon=True).start()
+        threading.Thread(target=receive_messages, daemon=True).start()
 
-    while True:
-        command = input()
-        if command:
-            client_socket.send(command.encode('utf-8'))
+        while True:
+            message = input("You: ")
+            if not message:
+                break
+            client.send(message.encode('utf-8'))
+        client.close()
+    except Exception as e:
+        print(f"Client error: {e}")
 
 if __name__ == "__main__":
-    choice = input("Enter (s) to start a server or (j) to join a server: ").strip().lower()
+    print("Choose mode:")
+    print("1. Server")
+    print("2. Client")
+    choice = input("Enter choice: ")
 
-    if choice == "s":
+    if choice == "1":
         start_server()
-    elif choice == "j":
-        server_ip = input("Enter server IP: ").strip()
-        nickname = input("Enter your nickname: ").strip()
-        start_client(server_ip, nickname)
+    elif choice == "2":
+        start_client()
     else:
-        print("Invalid choice")
+        print("Invalid choice. Exiting.")
