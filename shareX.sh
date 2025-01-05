@@ -14,13 +14,16 @@ function start_ssh_server() {
 
 # Function: Display connection information
 function display_connection_info() {
-    IP=$(ifconfig wlan0 | grep 'inet ' | awk '{print $2}')
+    # Fetch the IP address using 'ip' command
+    IP=$(ip -o -4 addr show wlan0 | awk '{print $4}' | cut -d/ -f1)
     PORT=$(cat $PREFIX/etc/ssh/sshd_config | grep '^Port ' | awk '{print $2}')
     USER=$(whoami)
+    
     if [ -z "$IP" ]; then
         echo "Could not retrieve IP address. Ensure you're connected to Wi-Fi."
         exit 1
     fi
+    
     echo "Your device is ready for SSH connections."
     echo "SSH Command: ssh -p $PORT $USER@$IP"
 }
