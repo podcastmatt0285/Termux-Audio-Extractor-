@@ -2,6 +2,9 @@
 
 pkg update -y && pkg upgrade -y
 
+#install iproute2
+pkg install iproute2
+
 # Function to check if Git is installed
 function check_git() {
     if command -v git &> /dev/null; then
